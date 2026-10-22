@@ -298,3 +298,4 @@
 .hero-kids .kidfig{height:clamp(48px,7.5vh,86px)}
 .hero-kids .kidfig+.kidfig{margin-inline-start:-14%}
 .mapview.leaving-map .mapscene{transition:transform var(--m-out) ease-in,opacity var(--m-out);transform:scale(1.18);opacity:.2}
+.pc-head h2 svg{width:22px;height:22px;vertical-align:-3px}

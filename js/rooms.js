@@ -60,7 +60,7 @@ function viewRoom(root, id){
     walk:(x, done)=>walkKids(kidsEl, x, done),
     open:html=>{ task.hidden=false; task.innerHTML=`<button class="ibtn task-x" aria-label="إغلاق">${IC.close}</button>`+html; $(".task-x",task).onclick=()=>{ task.hidden=true; }; return task; },
     close:()=>{ task.hidden=true; task.innerHTML=""; },
-    refresh:()=>{ drawSpots(); drawBar(); obj(); },
+    refresh:()=>{ drawSpots(); drawBar(); obj(); const art=$(".room-art",v); if(art && ctx._drawn) art.innerHTML=(R.bg?R.bg():"")+(R.props?R.props():""); ctx._drawn=true; },
     cheer:()=>{ $$(".kidfig",kidsEl).forEach(k=>kidAct(k,"happy")); }
   };
   const obj=()=>{ $("[data-obj]",v).textContent = R.objective ? R.objective() : NODES[id].desc; };
@@ -83,10 +83,13 @@ function viewRoom(root, id){
   function runPuzzle(){ if(!R.puzzle || R.puzzle.done()) return; R.puzzle.run(ctx, ()=>{ ctx.close(); Sound.win(); confetti(); ctx.cheer(); R.puzzle.reward(ctx); setTimeout(()=>ctx.refresh(), 50); }); }
   ctx.runPuzzle = runPuzzle;
   bindCollectibles(v);
-  const talk=$("[data-talk]",v); if(talk) talk.onclick=()=>{ const fig=$(".npc-fig",talk); react(fig,"hop"); ctx.walk(R.npc.x-10, ()=>ctx.say(R.talk ? R.talk(ctx) : [[R.npc.id,0,npcLine(R.npc.id)]], ()=>ctx.refresh())); };
+  const talk=$("[data-talk]",v); if(talk) talk.onclick=()=>{ const fig=$(".npc-fig",talk); react(fig,"hop"); ctx.walk(R.npc.x-10, ()=>ctx.say(R.talk ? R.talk(ctx) : [[R.npc.id,0,npcLine(R.npc.id)]], ()=>{ met(); ctx.refresh(); })); };
   $$(".room-kids .kidfig",v).forEach(k=>k.onclick=()=>{ kidAct(k,"jump"); Sound.soft(); });
   ctx.refresh();
-  if(firstVisit){ WS.flags["room_"+id]=true; saveWorld(); if(R.intro) setTimeout(()=>ctx.say(R.intro(ctx), ()=>ctx.refresh()), motionOK()?700:100); }
+  const met=()=>{ if(R.npc){ const k={saadoun:"metSaadoun",cat:"metCat",sumo:"metSumo",narjis:"metNarjis",owl:"metOwl"}[R.npc.id]; if(k) setFlag(k); } };
+  // المقدمة تنحسب «انشافت» بس لما تخلص، حتى لو انسدت الصفحة بالنص ترجع تطلع
+  const seen=()=>{ WS.flags["room_"+id]=true; saveWorld(); met(); ctx.refresh(); };
+  if(firstVisit){ if(R.intro) setTimeout(()=>{ if(document.body.contains(v)) ctx.say(R.intro(ctx), seen); }, motionOK()?700:100); else seen(); }
   const off = Party.connected() ? Party.on("room", m=>{ if(m.id===id && m.ev==="refresh") ctx.refresh(); }) : null;
   return ()=>{ ro && ro.disconnect(); off && off(); };
 }

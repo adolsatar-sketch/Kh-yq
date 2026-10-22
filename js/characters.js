@@ -36,7 +36,7 @@ function dialogue(host, lines, done){
       opts.innerHTML = L.opts.map((o,k)=>`<button class="btn ghost small dlg-opt" data-o="${k}"><span class="dlg-k">${k+1}</span>${esc(o.t)}</button>`).join("");
       $$(".dlg-opt",opts).forEach(b=>b.onclick=()=>choose(+b.dataset.o));
       setTimeout(()=>{ const f=$(".dlg-opt",opts); f && f.focus(); }, 20);
-    } else { nextBtn.textContent = i===lines.length-1?"يلا":"التالي"; }
+    } else { opts.innerHTML=""; nextBtn.textContent = i===lines.length-1?"يلا":"التالي"; }
     const fig = host.querySelector(`.kidfig[data-kid="${w}"]`); if(fig) kidAct(fig, isAsk?"wait":"talk");
     Sound.soft();
   };

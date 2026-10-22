@@ -335,7 +335,7 @@ function placeCard(id, host){
     ${marks.length?`<p class="pc-marks">${marks.map(([c,s,t])=>`<span><i class="wm-mark ${c}">${s}</i>${t}</span>`).join("")}</p>`:""}
     <div class="sign-opts">${acts.map((a,i)=>`<button class="sign-opt ${a.hot?"hot":""}" data-a="${i}" ${a.dis?"disabled":""}>${a.art?a.art():IC[a.ic||"star"]}<span><b>${esc(a.l)}</b>${a.s?`<small>${esc(a.s)}</small>`:""}</span></button>`).join("")}</div>`, {cls:"signboard autumn-sign"});
   $$("[data-a]",md.el).forEach(b=>b.onclick=()=>{ md.close(); acts[+b.dataset.a].run(); });
-  if(n.npc==="cat") setFlag("metCat"); if(n.npc==="sumo") setFlag("metSumo");
+  if(n.npc==="cat") setFlag("metCat"); if(n.npc==="sumo") setFlag("metSumo"); if(n.npc==="saadoun") setFlag("metSaadoun");
   // المكافآت اللي تنطى من بطاقة المكان
   if(id==="forest" && !WS.tickets.includes("elaf") && (forestWins()||progress.secrets.length)) setTimeout(()=>giveTicket("elaf"), 400);
   if(id==="forest" && WS.tickets.includes("elaf") && forestWins()>=2 && !hasItem("seed")) setTimeout(()=>giveItem("seed"), 700);

@@ -27,7 +27,7 @@ const motionOK = () => !prefs.calm && !sysReduce.matches;
 const finePointer = window.matchMedia && matchMedia("(pointer:fine)").matches;
 // أجهزة ضعيفة أو توفير بيانات: نقلل الأوراق المتطايرة والـparallax
 const lowPower = (()=>{ try{ const c=navigator.connection; return (navigator.hardwareConcurrency && navigator.hardwareConcurrency<=2) || (navigator.deviceMemory && navigator.deviceMemory<=2) || !!(c && c.saveData); }catch(e){ return false; } })();
-document.documentElement.style.setProperty("--forest", `url("${FOREST}")`);
+document.documentElement.style.setProperty("--forest", `url("${new URL(FOREST, location.href).href}")`); // رابط كامل حتى ما ينحسب نسبةً لمجلد css
 
 /* ============ icons ============ */
 const IC = {
