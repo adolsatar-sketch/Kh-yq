@@ -221,7 +221,6 @@ function viewWorld(root){
   const firstTime = !flag("mapRevealed");
   const fresh = WS.fresh.slice(); WS.fresh=[]; saveWorld();
   const kidsHTML = `<div class="wm-kids" id="wmKids">${kidFigure("k")}${kidFigure("y")}</div>`;
-  const friendAt = Party.connected() && Party.friendAt && NODES[Party.friendAt] ? Party.friendAt : null;
   const v = h(`<section class="view world-map ${firstTime&&motionOK()?"revealing":""}">
     <div class="mapscroll"><div class="mapscene wm-scene">
       <img class="wm-img" src="${CASTLE}" alt="خريطة العالم: القلعة الخريفية والبلدة والدروب" draggable="false">
@@ -239,7 +238,6 @@ function viewWorld(root){
           <span class="tag">${n.gate?`<i class="wn-num">${n.gate}</i>`:""}${esc(mystery?"مكان مجهول":n.name)}</span>
           ${marks.length?`<span class="wn-marks">${marks.map(([c,s,t])=>`<i class="wm-mark ${c}" title="${t}">${s}</i>`).join("")}</span>`:""}
         </button>`; }).join("")}
-      ${friendAt?`<div class="wm-friend" style="left:${NODES[friendAt].x}%;top:${NODES[friendAt].y}%">${kidFigure(Party.other?Party.other.char:"y","ghost")}<b>${esc(Party.other?Party.other.name:"صديق")}</b></div>`:""}
       ${kidsHTML}
       ${leafLayer(lowPower?4:9)}
     </div></div>
@@ -309,7 +307,11 @@ function viewWorld(root){
     else { place(NODES.plaza.x,NODES.plaza.y); WS.at="plaza"; saveWorld(); intro(); }
   } else if(fresh.length){ timers.push(setTimeout(()=>focusNode(fresh[fresh.length-1]), 500)); }
   const offs=[];
-  if(Party.connected()){ Party.send({t:"at", node:WS.at}); offs.push(Party.on("at", ()=>{ if(!walking) go("world", false); })); }
+  // مكان صاحبك على الخريطة: نحرّك رمزه بمكانه بدون إعادة رسم الخريطة
+  const placeFriend=()=>{ let f=$(".wm-friend",v); const at=Party.friendAt; if(!Party.connected() || !at || !NODES[at]){ f&&f.remove(); return; }
+    if(!f){ f=h(`<div class="wm-friend">${kidFigure(Party.other?Party.other.char:"y","ghost")}<b>${esc(Party.other?Party.other.name:"صديق")}</b></div>`); scene.insertBefore(f, kids); }
+    f.style.left=NODES[at].x+"%"; f.style.top=NODES[at].y+"%"; };
+  if(Party.connected()){ Party.send({t:"at", node:WS.at}); offs.push(Party.on("at", placeFriend), Party.on("status", placeFriend)); placeFriend(); }
   return ()=>{ timers.forEach(clearTimeout); mv && window.removeEventListener("pointermove", mv); offs.forEach(f=>f()); };
 }
 
@@ -386,6 +388,16 @@ function trainRide(){
   modal(`<h2>رحلة على القناطر</h2><div class="ride"><div class="ride-far"></div><div class="ride-near"></div><div class="ride-train">${NODE_IC.train()}<span>${faceHTML("k",1,40)}${faceHTML("y",1,40)}</span></div></div><p class="d-note">القطار يمر فوگ الضباب… عدد الرحلات: ${WS.flags.trainRides}</p>`,{wide:true});
   Sound.chime(); addStarsOnce("train",1,"أول رحلة قطار");
 }
+
+/* كاميرا على لوحة القلعة: تقرّب على نقطة (cx,cy) بنسبة z بدون أي تعديل على الملف */
+function paintCam(box, cx, cy, z){
+  box.classList.add("room-cam"); box.innerHTML=`<img src="${CASTLE}" alt="" draggable="false">`;
+  const img=$("img",box);
+  const fit=()=>{ const W=box.clientWidth, H=box.clientHeight; if(!W||!H) return; const iw=Math.max(W, H*CASTLE_W/CASTLE_H)*z, ih=iw*CASTLE_H/CASTLE_W; let l=W/2-cx*iw, t=H/2-cy*ih; l=Math.min(0,Math.max(W-iw,l)); t=Math.min(0,Math.max(H-ih,t)); Object.assign(img.style,{width:iw+"px",height:ih+"px",left:l+"px",top:t+"px"}); };
+  const ro=new ResizeObserver(fit); ro.observe(box); fit(); return ()=>ro.disconnect();
+}
+// كل لعبة ثنائية تنلعب بمكانها الحقيقي من لوحة القلعة
+const GAME_CAM = {sling:[.33,.8,2.4], maze:[.36,.77,2.8], lanterns:[.07,.6,2.6], bridge:[.55,.42,2.6], library:[.42,.36,3], orchestra:[.63,.28,3.2], train:[.16,.53,2.6], race:[.7,.82,2.4], greenhouse:[.575,.55,3]};
 
 /* ---------- لوحة الألعاب: إعلانات مثبّتة على لوح خشب بالساحة ---------- */
 const GAME_AT = {sling:"garden", maze:"garden", lanterns:"lanterns", bridge:"gate", library:"library", orchestra:"tower", train:"station", race:"palaceRoad", greenhouse:"greenhouse"};

@@ -8,7 +8,7 @@ function viewPlay(root, id){
   const role = net ? (Party.me.char==="k"?"A":"B") : "both";
   const charOf = r => r==="A"?"k":"y";
   let S = null, raf=0, last=0, lastSend=0, lastSnap=0, ended=false, paused=false, started=false;
-  const v = h(`<section class="view play play-${id}"><div class="play-bg" style="${def.bg||""}"></div>${leafLayer(6,"soft")}
+  const v = h(`<section class="view play play-${id}"><div class="play-bg"><div class="play-cam"></div><div class="play-tint" style="${def.bg||""}"></div></div>${leafLayer(6,"soft")}
     <div class="play-wrap">
       <header class="play-head panel"><div class="ph-title">${def.icon?`<span class="ph-ic">${def.icon()}</span>`:""}<div><h2>${esc(def.title)}</h2><p>${esc(def.tag||"")}</p></div></div>
         <div class="ph-side"><span class="chip" data-stat></span><span class="chip net-chip" data-net>${net?"لعب مع "+esc(Party.other?Party.other.name||"صديق":"صديق"):"على نفس الجهاز"}</span></div></header>
@@ -20,6 +20,7 @@ function viewPlay(root, id){
   </section>`);
   root.appendChild(v);
   const stage=$("[data-stage]",v), ov=$("[data-ov]",v);
+  const camOff = GAME_CAM[id] ? paintCam($(".play-cam",v), ...GAME_CAM[id]) : null;
   const ctx = {
     id, net, role, isHost, solo:!net, stage, root:v, charOf,
     mine: r => role==="both" || role===r,
@@ -83,7 +84,7 @@ function viewPlay(root, id){
   if(net && isHost){ let snap=null; try{ snap=JSON.parse(sessionStorage.getItem("khy_snap_"+id)||"null"); }catch(e){} if(snap && snap.S && !snap.ended){ S=snap.S; started=true; ov.hidden=true; if(def.mount) def.mount(ctx); render(); last=performance.now(); if(def.tick||def.frame) raf=requestAnimationFrame(loop); setTimeout(()=>toast("رجعنا لنفس الجولة","check"),300); } }
   const kd = e => { if(def.key && S && !paused && !ended && !e.target.matches("input,textarea")) def.key(e, S, ctx); };
   window.addEventListener("keydown", kd);
-  return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown",kd); offs.forEach(f=>f()); if(def.unmount) def.unmount(ctx); Party.snapshot=null; };
+  return () => { camOff && camOff(); cancelAnimationFrame(raf); window.removeEventListener("keydown",kd); offs.forEach(f=>f()); if(def.unmount) def.unmount(ctx); Party.snapshot=null; };
 }
 // seeded rng
 function rng(seed){ let s=seed>>>0||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }

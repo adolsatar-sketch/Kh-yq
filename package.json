@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm --prefix server start",
     "test": "npm --prefix server test",
-    "test:e2e": "node tests/smoke.mjs && node tests/quest.mjs && node tests/multiplayer.mjs && node tests/shared-tale.mjs"
+    "test:e2e": "node tests/smoke.mjs && node tests/quest.mjs && node tests/multiplayer.mjs && node tests/shared-tale.mjs && node tests/friend-map.mjs"
   },
   "devDependencies": {
     "playwright": "1.56.1"

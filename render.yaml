@@ -1,0 +1,17 @@
+# نشر على Render.com: New → Blueprint → اختاروا هذا المستودع
+services:
+  - type: web
+    name: khabbab-yaqeen
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: cd server && npm ci --omit=dev
+    startCommand: node server/relay.mjs
+    healthCheckPath: /health
+    envVars:
+      - key: SERVE_STATIC
+        value: "1"
+      - key: ROOM_TTL_HOURS
+        value: "6"
+      - key: SEAT_GRACE_SECONDS
+        value: "120"

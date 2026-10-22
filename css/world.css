@@ -299,3 +299,14 @@
 .hero-kids .kidfig+.kidfig{margin-inline-start:-14%}
 .mapview.leaving-map .mapscene{transition:transform var(--m-out) ease-in,opacity var(--m-out);transform:scale(1.18);opacity:.2}
 .pc-head h2 svg{width:22px;height:22px;vertical-align:-3px}
+/* الألعاب الثنائية بأماكنها من اللوحة */
+.play-bg{opacity:1}
+.play-cam{position:absolute;inset:0}
+.play-tint{position:absolute;inset:0;opacity:.62}
+.play .play-head,.play .roles .role{backdrop-filter:blur(2px)}
+.view.play{position:absolute;inset:0}
+.view.play .play-bg{position:fixed;inset:0}
+.mc-wcol{display:flex;gap:5px;flex-wrap:wrap;align-items:center;font-weight:700;font-size:.85rem}.mc-wcol .swatch{width:26px;height:26px}
+.kidfig .kf-wings{top:-36%;width:170%}
+.wm-friend{transition:left .6s ease-in-out,top .6s ease-in-out}
+.wm-friend{z-index:7;transform:translate(35%,-100%)}.wm-friend .kidfig.ghost{opacity:.8}

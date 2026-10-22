@@ -140,7 +140,8 @@ function onClose(ws){
 
 /* ---------- HTTP: صحة الخادم + ملفات الموقع ---------- */
 const MIME = { ".html":"text/html; charset=utf-8", ".js":"text/javascript; charset=utf-8", ".mjs":"text/javascript; charset=utf-8", ".css":"text/css; charset=utf-8", ".png":"image/png", ".webp":"image/webp", ".jpg":"image/jpeg", ".jpeg":"image/jpeg", ".svg":"image/svg+xml", ".json":"application/json", ".ico":"image/x-icon", ".md":"text/plain; charset=utf-8", ".txt":"text/plain; charset=utf-8" };
-const BLOCK = /(^|\/)(\.|node_modules|server|tests?)(\/|$)|\.env/;
+// نخدم ملفات الموقع بس (قائمة سماح)، وما نكشف ملفات المستودع الثانية
+const ALLOW = /^(index\.html|site\.config\.js|(css|js|assets)\/[\w\-./]+)$/;
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, "http://x");
   if(url.pathname === "/health"){ res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify({ ok: true, rooms: rooms.size })); return; }
@@ -148,7 +149,7 @@ const server = http.createServer((req, res) => {
   if(url.pathname === "/site.config.js"){ res.writeHead(200, { "content-type": MIME[".js"], "cache-control": "no-store" }); res.end(`window.KY_CONFIG = { relayUrl: "/ws" };\n`); return; }
   let p = decodeURIComponent(url.pathname); if(p.endsWith("/")) p += "index.html";
   const rel = path.normalize(p).replace(/^([/\\])+/, "");
-  if(BLOCK.test(rel.replace(/\\/g, "/"))){ res.writeHead(404); res.end(); return; }
+  if(!ALLOW.test(rel.replace(/\\/g, "/")) || rel.includes("..")){ res.writeHead(404); res.end(); return; }
   const file = path.join(ROOT, rel);
   if(!file.startsWith(ROOT)){ res.writeHead(403); res.end(); return; }
   fs.stat(file, (err, st) => {

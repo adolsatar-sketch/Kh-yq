@@ -48,4 +48,7 @@ test("serves the site and a same-origin config", async () => {
   const idx = await fetch(`http://127.0.0.1:${port}/`); assert.equal(idx.status, 200);
   const hidden = await fetch(`http://127.0.0.1:${port}/server/relay.mjs`); assert.equal(hidden.status, 404);
   const env = await fetch(`http://127.0.0.1:${port}/.env.example`); assert.equal(env.status, 404);
+  for(const f of ["Dockerfile","package.json","README.md","tests/smoke.mjs","js/../server/relay.mjs"]) assert.equal((await fetch(`http://127.0.0.1:${port}/${f}`)).status, 404, f);
+  assert.equal((await fetch(`http://127.0.0.1:${port}/js/world.js`)).status, 200);
+  assert.equal((await fetch(`http://127.0.0.1:${port}/assets/world_autumn_castle.png`)).status, 200);
 });
