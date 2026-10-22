@@ -1,3 +1,59 @@
+/* =====================================================================
+   عالم أيلاف — غابتها، ألعابها، نكتها، الكهف، وشخصياتها (جعموص وسومو).
+   هذا العالم صار بصفحة مستقلة (elaf.html) ومنفصل عن لعبة خباب ويقين.
+   ===================================================================== */
+const settings = Object.assign({heroName:CONFIG.heroName, welcome:CONFIG.welcome, siteTitle:CONFIG.siteTitle, accent:CONFIG.accent, theme:"auto", secretLetter:CONFIG.secretLetter}, Store.get("settings", {}));
+const heroName = () => settings.heroName || CONFIG.heroFallback;
+// جعموص — دمية قماشية أصلية جالسة: راس كبير مدوّر، جسم صغير، ورقة عسلية فوق الراس
+ART.jaamous = (state="idle") => {
+  const eyes = state==="happy"
+    ? '<path d="M64 100q12-14 24 0M112 100q12-14 24 0" fill="none" stroke="#2F2A20" stroke-width="6" stroke-linecap="round"/>'
+    : `<g><circle cx="76" cy="100" r="15" fill="#2F2A20"/><circle cx="124" cy="100" r="15" fill="#2F2A20"/><circle cx="${state==="think"?80:71}" cy="${state==="think"?92:94}" r="5" fill="#fff"/><circle cx="${state==="think"?128:119}" cy="${state==="think"?92:94}" r="5" fill="#fff"/><circle cx="${state==="think"?84:80}" cy="104" r="2" fill="#fff" opacity=".7"/><rect class="lid" x="59" y="83" width="34" height="34" rx="17" fill="#9DBF8E"/><rect class="lid" x="107" y="83" width="34" height="34" rx="17" fill="#9DBF8E"/></g>`;
+  const mouth = state==="happy" ? '<path d="M84 124q16 20 32 0z" fill="#8E4536" stroke="#2F2A20" stroke-width="3" stroke-linejoin="round"/><path d="M92 132q8 5 16 0" fill="#E9A79E"/>'
+    : state==="think" ? '<path d="M92 128q8-4 16 0" fill="none" stroke="#2F2A20" stroke-width="4" stroke-linecap="round"/>'
+    : '<path d="M86 124q14 12 28 0" fill="none" stroke="#2F2A20" stroke-width="4" stroke-linecap="round"/>';
+  return `<svg class="jm jm-${state}" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CONFIG.companionName}">
+  <ellipse cx="100" cy="212" rx="70" ry="7" fill="rgba(60,50,30,.16)"/>
+  <ellipse cx="66" cy="196" rx="26" ry="16" fill="#7FA374" stroke="#4E6A46" stroke-width="3.5"/>
+  <ellipse cx="134" cy="196" rx="26" ry="16" fill="#7FA374" stroke="#4E6A46" stroke-width="3.5"/>
+  <ellipse cx="58" cy="196" rx="10" ry="8" fill="#F4EBD0" opacity=".9"/><ellipse cx="142" cy="196" rx="10" ry="8" fill="#F4EBD0" opacity=".9"/>
+  <ellipse cx="100" cy="172" rx="48" ry="34" fill="#93B886" stroke="#4E6A46" stroke-width="3.5"/>
+  <ellipse cx="100" cy="176" rx="24" ry="17" fill="#F4EBD0" stroke="#C9B98E" stroke-width="2.5"/>
+  <ellipse cx="100" cy="176" rx="18" ry="12" fill="none" stroke="#C9B98E" stroke-width="2" stroke-dasharray="3 4"/>
+  <ellipse cx="50" cy="166" rx="14" ry="20" transform="rotate(30 50 166)" fill="#88AC7E" stroke="#4E6A46" stroke-width="3.5"/>
+  <g class="arm-r"><ellipse cx="150" cy="166" rx="14" ry="20" transform="rotate(-30 150 166)" fill="#88AC7E" stroke="#4E6A46" stroke-width="3.5"/></g>
+  <circle cx="100" cy="94" r="72" fill="#9DBF8E" stroke="#4E6A46" stroke-width="3.5"/>
+  <path d="M100 24V56" stroke="#4E6A46" stroke-width="2.5" stroke-dasharray="5 5"/>
+  <path d="M40 120q60 30 120 0" stroke="#4E6A46" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".5"/>
+  <rect x="140" y="60" width="18" height="16" rx="3" transform="rotate(14 149 68)" fill="#B9A6DD" stroke="#7F6AA8" stroke-width="2"/>
+  <path d="M144 64l9 7M153 64l-9 7" stroke="#7F6AA8" stroke-width="2" transform="rotate(14 149 68)"/>
+  <path d="M100 24C98 14 100 8 106 2" stroke="#7A5A3A" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M104 8C120-6 148-2 152 12C136 24 116 22 104 8Z" fill="#E8C066" stroke="#B88F33" stroke-width="2.5"/>
+  <path d="M108 9C122 6 136 8 148 12" stroke="#B88F33" stroke-width="2" fill="none"/>
+  <ellipse cx="56" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><ellipse cx="144" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/>
+  ${eyes}${mouth}
+  </svg>`;
+};
+ART.jmFace = () => `<svg viewBox="20 -6 160 180" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="94" r="72" fill="#9DBF8E" stroke="#4E6A46" stroke-width="5"/><circle cx="76" cy="100" r="15" fill="#2F2A20"/><circle cx="124" cy="100" r="15" fill="#2F2A20"/><circle cx="71" cy="94" r="5" fill="#fff"/><circle cx="119" cy="94" r="5" fill="#fff"/><path d="M86 124q14 12 28 0" fill="none" stroke="#2F2A20" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><ellipse cx="144" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><path d="M104 8C120-6 148-2 152 12C136 24 116 22 104 8Z" fill="#E8C066" stroke="#B88F33" stroke-width="3"/></svg>`;
+// سومو — ضيف أصلي: فطر صغير ممتلئ بقبعة وردية منقّطة
+ART.sumo = (state="idle") => `<svg class="sumo" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CONFIG.guestName}">
+  <ellipse cx="100" cy="210" rx="52" ry="7" fill="rgba(60,50,30,.16)"/>
+  <ellipse cx="78" cy="200" rx="16" ry="10" fill="#C9A77E" stroke="#8C6C48" stroke-width="3"/><ellipse cx="122" cy="200" rx="16" ry="10" fill="#C9A77E" stroke="#8C6C48" stroke-width="3"/>
+  <path d="M56 110C52 160 62 198 100 198C138 198 148 160 144 110Z" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3.5"/>
+  <ellipse cx="48" cy="146" rx="12" ry="18" transform="rotate(20 48 146)" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3"/>
+  <ellipse cx="152" cy="146" rx="12" ry="18" transform="rotate(-20 152 146)" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3"/>
+  <path d="M18 108C20 52 62 22 100 22C138 22 180 52 182 108C150 120 50 120 18 108Z" fill="#D99BB0" stroke="#9A5C72" stroke-width="3.5"/>
+  <circle cx="64" cy="66" r="11" fill="#FBF3E3"/><circle cx="104" cy="44" r="9" fill="#FBF3E3"/><circle cx="142" cy="72" r="12" fill="#FBF3E3"/><circle cx="40" cy="96" r="7" fill="#FBF3E3"/><circle cx="164" cy="98" r="6" fill="#FBF3E3"/>
+  ${state==="happy" ? '<path d="M78 142q7-8 14 0M108 142q7-8 14 0" fill="none" stroke="#2F2A20" stroke-width="4.5" stroke-linecap="round"/>' : '<circle cx="85" cy="142" r="6.5" fill="#2F2A20"/><circle cx="115" cy="142" r="6.5" fill="#2F2A20"/><circle cx="87" cy="140" r="2" fill="#fff"/><circle cx="117" cy="140" r="2" fill="#fff"/>'}
+  <ellipse cx="72" cy="156" rx="8" ry="5" fill="#E9A79E" opacity=".7"/><ellipse cx="128" cy="156" rx="8" ry="5" fill="#E9A79E" opacity=".7"/>
+  <path d="M93 158q7 7 14 0" fill="none" stroke="#2F2A20" stroke-width="3.5" stroke-linecap="round"/>
+</svg>`;
+Object.assign(STICKERS, {
+  jaamous:{label:CONFIG.companionName, src:svgURL(ART.jaamous("happy"))},
+  sumo:{label:CONFIG.guestName, src:svgURL(ART.sumo("happy")), lock:"sumo"},
+  hero:{label:CONFIG.heroName||"البطلة", src:GIRL, lock:"hero"}
+});
+["jaamous","sumo","hero"].forEach(k=>loadImg("stk_"+k, STICKERS[k].src));
 /* ============ places & games registry ============ */
 const GAMES = {
   fireflies:{title:"سماء اليراعات", place:"lake", how:"صيدي اليراعات قبل لا تختفي. كل وحدة تطير للسما وتضوّي نقطة من سرّ مخبّى.", icon:()=>ART.firefly(), best:v=>`أقل هاربات: ${v}`},
@@ -42,7 +98,6 @@ function ambientLayer(n=8){
 function girlImg(cls="idle", alt){ return `<img class="girl ${cls}" src="${GIRL}" alt="${esc(alt||heroName())}" draggable="false">`; }
 function jmHTML(state="idle", cls=""){ return `<div class="jm-wrap ${cls}">${ART.jaamous(state)}</div>`; }
 function sumoHTML(state="idle"){ return `<div class="sumo-wrap">${ART.sumo(state)}</div>`; }
-function react(el, cls){ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 1100); }
 
 /* ============ INTRO ============ */
 function viewIntro(root){
@@ -97,7 +152,6 @@ function tour(){
 }
 
 /* ============ MAP ============ */
-function catmull(pts){ let d=`M${pts[0][0]} ${pts[0][1]}`; for(let i=0;i<pts.length-1;i++){ const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2; const c1=[p1[0]+(p2[0]-p0[0])/6, p1[1]+(p2[1]-p0[1])/6], c2=[p2[0]-(p3[0]-p1[0])/6, p2[1]-(p3[1]-p1[1])/6]; d+=` C${c1[0].toFixed(2)} ${c1[1].toFixed(2)} ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} ${p2[0]} ${p2[1]}`; } return d; }
 function viewMap(root){
   const H = 56.25; // viewBox height for 16:9 at width 100
   const pts = PATH_ORDER.map(k=>[PLACES[k].x, PLACES[k].y*H/100]);
@@ -113,11 +167,10 @@ function viewMap(root){
       <button class="critter" data-critter="rabbit" style="left:55%;top:76%;width:46px" aria-label="أرنب">${ART.rabbit()}</button>
       <div class="hero-token" id="heroTok">${girlImg("idle")}</div>
       <button class="jm-token" id="jmTok" aria-label="${CONFIG.companionName}"><div class="jm-wrap">${ART.jaamous("idle")}</div></button>
-      <div class="hero-kids" id="kidsTok" aria-hidden="true">${kidFigure("k")}${kidFigure("y")}</div>
       ${ambientLayer(6)}
     </div></div>
     <div class="map-hint panel" id="mapHint">${esc(CONFIG.mapHint)}</div>
-    <div class="map-ui"><button class="btn honey" id="toCastle">${IC.map} طريق قلعة الخريف</button><button class="btn ghost" id="allPlaces">${IC.list} كل الأماكن</button><button class="btn honey" id="mapSurprise">${IC.gift} فاجئيني</button></div>
+    <div class="map-ui"><button class="btn ghost" id="allPlaces">${IC.list} كل الأماكن</button><button class="btn honey" id="mapSurprise">${IC.gift} فاجئيني</button></div>
   </section>`);
   root.appendChild(v);
   const scene=$(".mapscene",v), scroll=$(".mapscroll",v), path=$(".map-path path",v), tok=$("#heroTok",v), jt=$("#jmTok",v);
@@ -125,8 +178,7 @@ function viewMap(root){
   const total = path.getTotalLength(); const lens = {};
   PATH_ORDER.forEach(k=>{ const tx=PLACES[k].x, ty=PLACES[k].y*H/100; let best=0,bd=1e9; for(let i=0;i<=400;i++){ const p=path.getPointAtLength(total*i/400); const dd=(p.x-tx)**2+(p.y-ty)**2; if(dd<bd){bd=dd;best=total*i/400;} } lens[k]=best; });
   let at = Store.get("mapAt", "square"); if(!PLACES[at]) at="square";
-  const kt=$("#kidsTok",v);
-  const place = (x,y) => { tok.style.left=(x-4.2)+"%"; tok.style.top=(y+5)+"%"; jt.style.left=(x+4)+"%"; jt.style.top=(y+6)+"%"; kt.style.left=(x-11)+"%"; kt.style.top=(y+6)+"%"; };
+  const place = (x,y) => { tok.style.left=(x-4.2)+"%"; tok.style.top=(y+5)+"%"; jt.style.left=(x+4)+"%"; jt.style.top=(y+6)+"%"; };
   place(PLACES[at].x, PLACES[at].y);
   // center scroll on hero
   requestAnimationFrame(()=>{ scroll.scrollLeft = Math.max(0, scene.offsetWidth*PLACES[at].x/100 - scroll.clientWidth/2); });
@@ -172,8 +224,6 @@ function viewMap(root){
     window.addEventListener("pointermove", mv);
   }
   $("#allPlaces",v).onclick = placesSheet;
-  $("#toCastle",v).onclick = () => { Sound.chime(); if(motionOK()){ v.classList.add("leaving-map"); setTimeout(()=>go("world"), 420); } else go("world"); };
-  if(!Store.get("forestMet",false)){ Store.set("forestMet",true); setTimeout(()=>dialogue(v,[["elaf",0,`هلا خباب ويقين! هاي غابتي. العبوا براحتكم، وكل فوز يعطيكم نجوم صداقة.`],["k",1,"شگد حلوة! بيها نكت؟"],["jm",1,"صندوق النكت يم شجرة المشمش. وإذا فزتوا بلعبة، "+heroName()+" عندها هدية إلكم بالخريطة."]]), 600); }
   $("#mapSurprise",v).onclick = surprise;
   return () => { clearTimeout(hintT); mv && window.removeEventListener("pointermove", mv); };
 }
@@ -204,8 +254,6 @@ $("#surpriseBtn").onclick = surprise;
 
 /* ============ GAME SHELL ============ */
 const oneLiner = () => { const j = CONFIG.jokes[1+Math.floor(Math.random()*(CONFIG.jokes.length-1))]; return j.s+" "+j.p; };
-const pick = a => a[Math.floor(Math.random()*a.length)];
-function rateStars(n){ return `<span class="rate" aria-label="${n} من 3">${[1,2,3].map(i=>`<span class="${i<=n?"on":""}">${IC.star}</span>`).join("")}</span>`; }
 function viewGame(root, id){
   const g = GAMES[id]; if(!g || g.route){ go("map"); return; }
   const worlds = {memory:"w-lake", story:"w-story", fireflies:"w-dusk", road:"w-meadow", logic:"w-bridge", bubbles:"w-sky", basket:"w-orchard", dance:"w-party", madlibs:"w-story"};
@@ -870,3 +918,15 @@ function viewCave(root){
   $$("[data-hint]",v).forEach(b=>b.onclick=()=>{ const x=SECRETS.find(k=>k.id===b.dataset.hint); toast("دوّري "+x.hint,"bulb"); });
 }
 
+
+/* مسارات صفحة عالم أيلاف */
+Object.assign(ROUTES, {
+  open:{view:(r)=>viewIntro(r), title:()=>settings.siteTitle, bare:true},
+  map:{view:(r)=>viewMap(r), title:()=>settings.siteTitle, parent:"open"},
+  paint:{view:(r,id)=>viewPaint(r,id), title:()=>"مرسم الفطر", parent:"map"},
+  diary:{view:(r)=>viewDiary(r), title:()=>"دفتر المذكرات", parent:"map"},
+  cave:{view:(r)=>viewCave(r), title:()=>"الكهف المضيء", parent:"map"},
+  jokes:{view:(r)=>viewJokes(r), title:()=>"صندوق النكت العبيطة", parent:"map"},
+  game:{view:(r,id)=>viewGame(r,id), title:id=>GAMES[id]?GAMES[id].title:"", parent:"map"}
+});
+Object.assign(ROUTE_ALIAS, {intro:"open", hub:"map"});

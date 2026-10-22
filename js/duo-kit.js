@@ -12,15 +12,14 @@ function viewPlay(root, id){
     <div class="play-wrap">
       <header class="play-head panel"><div class="ph-title">${def.icon?`<span class="ph-ic">${def.icon()}</span>`:""}<div><h2>${esc(def.title)}</h2><p>${esc(def.tag||"")}</p></div></div>
         <div class="ph-side"><span class="chip" data-stat></span><span class="chip net-chip" data-net>${net?"لعب مع "+esc(Party.other?Party.other.name||"صديق":"صديق"):"على نفس الجهاز"}</span></div></header>
-      <div class="roles">${["A","B"].map(r=>`<div class="role ${role===r||role==="both"?"mine":""}" data-role="${r}">${faceHTML(charOf(r),0,44)}<div><b>${CH[charOf(r)].name}${net&&role===r?" (إنتِ)":""}</b><small>${esc(def.roles[r])}</small></div></div>`).join("")}</div>
+      <div class="roles">${["A","B"].map(r=>`<div class="role ${role===r||role==="both"?"mine":""}" data-role="${r}">${faceHTML(charOf(r),0,44)}<div><b>${CH[charOf(r)].name}${net&&role===r?" (دورك)":""}</b><small>${esc(def.roles[r])}</small></div></div>`).join("")}</div>
       <div class="play-stage" data-stage></div>
-      ${net?`<div class="chat panel"><div class="chat-log" data-log aria-live="polite"></div><div class="chat-row">${["هنا!","وگفي على الزر","لحظة","يلا","شنو تشوفين؟","عاشت إيدك"].map(q=>`<button class="chip" data-q="${q}">${q}</button>`).join("")}<input data-chat maxlength="80" placeholder="اكتبي رسالة…" aria-label="رسالة"><button class="btn small" data-send>إرسال</button></div></div>`:""}<div class="play-bar"><button class="btn ghost small" data-help>${IC.bulb} تعليمات</button>${isHost?`<button class="btn ghost small" data-pause>${IC.pause} توقف</button><button class="btn ghost small" data-restart>${IC.restart} إعادة</button>`:""}<button class="btn ghost small" data-exit>خروج</button></div>
+      ${net?`<div class="chat panel"><div class="chat-log" data-log aria-live="polite"></div><div class="chat-row">${["هنا!","وگفي على الزر","لحظة","يلا","شنو تشوف؟","عاشت إيدك"].map(q=>`<button class="chip" data-q="${q}">${q}</button>`).join("")}<input data-chat maxlength="80" placeholder="اكتبوا رسالة…" aria-label="رسالة"><button class="btn small" data-send>إرسال</button></div></div>`:""}<div class="play-bar"><button class="btn ghost small" data-help>${IC.bulb} تعليمات</button>${isHost?`<button class="btn ghost small" data-pause>${IC.pause} توقف</button><button class="btn ghost small" data-restart>${IC.restart} إعادة</button>`:""}<button class="btn ghost small" data-exit>خروج</button></div>
     </div>
-    <div class="stage-ov play-ov" data-ov><div class="panel"><h3>${esc(def.title)}</h3><p>${esc(def.how)}</p>${net?"":`<p class="d-note">بنفس الجهاز تتحكمين بالدورين. للعب من جهازين افتحي «العب مع صديق» من الساحة.</p>`}${isHost?'<button class="btn honey" data-go>ابدئي</button>':'<p><b>صاحبك يبدي اللعبة…</b></p>'}</div></div>
+    <div class="stage-ov play-ov" data-ov><div class="panel"><h3>${esc(def.title)}</h3><p>${esc(def.how)}</p>${net?"":`<p class="d-note">بنفس الجهاز تتحكمون بالدورين. للعب من جهازين افتحوا «العب مع صديق» من الساحة أو زر «صديق» فوگ.</p>`}${isHost?'<button class="btn honey" data-go>ابدوا</button>':'<p><b>صاحبك يبدي اللعبة…</b></p>'}</div></div>
   </section>`);
   root.appendChild(v);
   const stage=$("[data-stage]",v), ov=$("[data-ov]",v);
-  const camOff = GAME_CAM[id] ? paintCam($(".play-cam",v), ...GAME_CAM[id]) : null;
   const ctx = {
     id, net, role, isHost, solo:!net, stage, root:v, charOf,
     mine: r => role==="both" || role===r,
@@ -38,6 +37,7 @@ function viewPlay(root, id){
     try{ sessionStorage.removeItem("khy_snap_"+id); }catch(e){}
     cancelAnimationFrame(raf); broadcast(true);
     const first = !progress.wins["kg_"+id]; progress.wins["kg_"+id]=(progress.wins["kg_"+id]||0)+1; saveProgress();
+    if(typeof onGameWin==="function") onGameWin(id);
     const n = 2 + (first?1:0) + ((r.rating||1)>=3?1:0);
     Sound.win(); confetti();
     setTimeout(()=>{
@@ -55,14 +55,14 @@ function viewPlay(root, id){
   function restart(){ if(!isHost) return; if(def.unmount) def.unmount(ctx); stage.innerHTML=""; start(); if(net) Party.send({t:"restart"}); }
   function exit(){ if(net){ Party.send({t:"exitgame"}); Party.game=null; go("lobby"); } else go("world"); }
   $("[data-help]",v).onclick=()=>modal(`<h3>${esc(def.title)}</h3><p>${esc(def.how)}</p><p><b>${CH[charOf("A")].name}:</b> ${esc(def.roles.A)}<br><b>${CH[charOf("B")].name}:</b> ${esc(def.roles.B)}</p>${def.keys?`<p class="d-note">${esc(def.keys)}</p>`:""}`);
-  const pb=$("[data-pause]",v); if(pb) pb.onclick=()=>{ if(!started) return; paused=!paused; S.paused=paused; broadcast(true); pb.innerHTML = paused?`${IC.check} كمّلي`:`${IC.pause} توقف`; toast(paused?"وقفنا شوي":"نكمل","pause"); last=performance.now(); };
+  const pb=$("[data-pause]",v); if(pb) pb.onclick=()=>{ if(!started) return; paused=!paused; S.paused=paused; broadcast(true); pb.innerHTML = paused?`${IC.check} كمّلوا`:`${IC.pause} توقف`; toast(paused?"وقفنا شوي":"نكمل","pause"); last=performance.now(); };
   const rb=$("[data-restart]",v); if(rb) rb.onclick=restart;
   $("[data-exit]",v).onclick=exit;
   const gob=$("[data-go]",v); if(gob) gob.onclick=()=>start();
   const offs=[];
   if(net){
     const log=$("[data-log]",v); const addMsg=(who,txt)=>{ const p=h(`<p><b>${esc(who)}:</b> ${esc(txt)}</p>`); log.appendChild(p); while(log.children.length>6) log.firstChild.remove(); log.scrollTop=log.scrollHeight; };
-    const sendChat=txt=>{ txt=String(txt||"").trim().slice(0,80); if(!txt) return; Party.send({t:"chat", m:txt}); addMsg("إنتِ",txt); };
+    const sendChat=txt=>{ txt=String(txt||"").trim().slice(0,80); if(!txt) return; Party.send({t:"chat", m:txt}); addMsg("أنت",txt); };
     $$("[data-q]",v).forEach(b=>b.onclick=()=>sendChat(b.dataset.q));
     $("[data-send]",v).onclick=()=>{ const i=$("[data-chat]",v); sendChat(i.value); i.value=""; };
     $("[data-chat]",v).onkeydown=e=>{ if(e.key==="Enter"){ sendChat(e.target.value); e.target.value=""; } };
@@ -84,7 +84,7 @@ function viewPlay(root, id){
   if(net && isHost){ let snap=null; try{ snap=JSON.parse(sessionStorage.getItem("khy_snap_"+id)||"null"); }catch(e){} if(snap && snap.S && !snap.ended){ S=snap.S; started=true; ov.hidden=true; if(def.mount) def.mount(ctx); render(); last=performance.now(); if(def.tick||def.frame) raf=requestAnimationFrame(loop); setTimeout(()=>toast("رجعنا لنفس الجولة","check"),300); } }
   const kd = e => { if(def.key && S && !paused && !ended && !e.target.matches("input,textarea")) def.key(e, S, ctx); };
   window.addEventListener("keydown", kd);
-  return () => { camOff && camOff(); cancelAnimationFrame(raf); window.removeEventListener("keydown",kd); offs.forEach(f=>f()); if(def.unmount) def.unmount(ctx); Party.snapshot=null; };
+  return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown",kd); offs.forEach(f=>f()); if(def.unmount) def.unmount(ctx); Party.snapshot=null; };
 }
 // seeded rng
 function rng(seed){ let s=seed>>>0||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }

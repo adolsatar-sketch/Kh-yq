@@ -1,5 +1,5 @@
 /* ============ شخصيات عالم القلعة الثانوية ============
-   مرسومة بنفس لغة رسم جعموص وسومو: أشكال مدوّرة، حدود أغمق من اللون، خدود وردية، ظل ناعم.
+   مرسومة بنفس لغة الرسم الأصلية للعالم: أشكال مدوّرة، حدود أغمق من اللون، خدود وردية، ظل ناعم.
    كل دالة تاخذ (state, crop) — crop=true ترجع الوجه فقط للحوار. */
 const npcSVG = (vb, crop, cropVB, label, body) => `<svg class="npc" viewBox="${crop?cropVB:vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${label}">${body}</svg>`;
 const npcEyes = (lx, rx, y, happy, r=5.5) => happy
@@ -82,29 +82,88 @@ ART.cat = (state="idle", crop=false, bell=false) => npcSVG("0 0 200 220", crop, 
 
 // جرس زعفرانة الضايع
 ART.bell = () => `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 4c-8 0-12 6-12 14v8l-4 6h32l-4-6v-8c0-8-4-14-12-14z" fill="#E8C066" stroke="#8C6A2A" stroke-width="2.5" stroke-linejoin="round"/><circle cx="20" cy="34" r="4" fill="#8C6A2A"/><path d="M14 14q4-5 8-4" stroke="#FFF2C8" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
-// قبعة سومو الوردية المنقّطة
-ART.sumoHat = () => `<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path d="M4 32C6 14 18 4 30 4s24 10 26 28C44 37 16 37 4 32Z" fill="#D99BB0" stroke="#9A5C72" stroke-width="2.5"/><circle cx="18" cy="20" r="4" fill="#FBF3E3"/><circle cx="32" cy="12" r="3.4" fill="#FBF3E3"/><circle cx="44" cy="22" r="4.4" fill="#FBF3E3"/></svg>`;
 ART.feather = () => `<svg viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg"><path d="M20 56C10 40 8 18 22 4c10 14 8 36-2 52z" fill="#B98A5E" stroke="#6E4A30" stroke-width="2"/><path d="M20 56C20 40 21 22 22 6M20 40l-6-6M21 30l6-6M21 22l-5-5" stroke="#6E4A30" stroke-width="1.6" fill="none"/></svg>`;
 ART.seed = () => `<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 6c10 6 12 22 0 30C8 28 10 12 20 6z" fill="#C99B63" stroke="#7A5A3A" stroke-width="2.4"/><path d="M20 10v22" stroke="#7A5A3A" stroke-width="1.6"/><path d="M20 6c2-4 6-5 9-4-1 4-5 6-9 4z" fill="#9DBF8E" stroke="#4E6A46" stroke-width="1.6"/></svg>`;
 ART.letter = () => `<svg viewBox="0 0 40 30" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="36" height="26" fill="#F7EEDC" stroke="#8C5A2B" stroke-width="2"/><path d="M2 2l18 14 18-14" fill="none" stroke="#8C5A2B" stroke-width="2"/><circle cx="20" cy="18" r="4" fill="#B5482A"/></svg>`;
 ART.glassKey = () => ART.key("#8EC3CF");
 ART.clockFace = (hh=10, mm=10) => clockSVG(hh, mm);
 
+// سِراج — يرّاعة ميكانيكية صغيرة من ساعات القلعة وفوانيسها: بطن زجاجي يضوي كهرماني، أجنحة بمفاصل تروس، ومفتاح تعبئة صغير
+ART.siraj = (state="idle", crop=false) => npcSVG("0 0 200 200", crop, "48 26 104 104", "سِراج", `
+  <defs><radialGradient id="sjg${crop?"c":""}" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#FFE3A3"/><stop offset=".55" stop-color="#F2B04A"/><stop offset="1" stop-color="#D98A3A"/></radialGradient></defs>
+  ${crop?"":`<circle class="sj-glow" cx="100" cy="140" r="62" fill="rgba(255,196,110,.28)"/>
+  <g class="wing"><path d="M84 96C52 60 18 66 22 92C26 112 60 112 84 104Z" fill="rgba(220,236,232,.55)" stroke="#6E8A6A" stroke-width="2.5"/><path d="M84 106C56 112 34 134 46 148C58 158 78 136 86 114Z" fill="rgba(220,236,232,.45)" stroke="#6E8A6A" stroke-width="2.5"/></g>
+  <g class="wing"><path d="M116 96C148 60 182 66 178 92C174 112 140 112 116 104Z" fill="rgba(220,236,232,.55)" stroke="#6E8A6A" stroke-width="2.5"/><path d="M116 106C144 112 166 134 154 148C142 158 122 136 114 114Z" fill="rgba(220,236,232,.45)" stroke="#6E8A6A" stroke-width="2.5"/></g>
+  <circle cx="84" cy="100" r="6" fill="#B88A5A" stroke="#6E4A2A" stroke-width="2" stroke-dasharray="3 2"/><circle cx="116" cy="100" r="6" fill="#B88A5A" stroke="#6E4A2A" stroke-width="2" stroke-dasharray="3 2"/>
+  <ellipse cx="100" cy="142" rx="30" ry="36" fill="url(#sjg)" stroke="#8A5A2A" stroke-width="3"/>
+  <path d="M84 132q16 8 32 0M86 148q14 7 28 0" stroke="#C9783A" stroke-width="2" fill="none" opacity=".7"/>
+  <path d="M96 120c-6 10 6 16 0 26M104 120c6 10-6 16 0 26" stroke="#FFF2C8" stroke-width="2" fill="none" opacity=".9"/>
+  <path d="M86 176l-6 10M100 178v12M114 176l6 10" stroke="#6E4A2A" stroke-width="3" stroke-linecap="round"/>
+  <g transform="translate(132 132) rotate(20)"><rect x="0" y="-3" width="14" height="6" rx="2" fill="#B88A5A" stroke="#6E4A2A" stroke-width="1.5"/><circle cx="18" cy="-5" r="5" fill="none" stroke="#6E4A2A" stroke-width="2.5"/><circle cx="18" cy="5" r="5" fill="none" stroke="#6E4A2A" stroke-width="2.5"/></g>
+  <rect x="76" y="100" width="48" height="12" rx="6" fill="#B88A5A" stroke="#6E4A2A" stroke-width="2.5"/>`}
+  <path d="M88 40c-6-10-2-20 6-22M112 40c6-10 2-20-6-22" stroke="#6E4A2A" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="4 2"/>
+  <circle cx="93" cy="17" r="5" fill="#FFD27A" stroke="#8A5A2A" stroke-width="2"/><circle cx="107" cy="17" r="5" fill="#FFD27A" stroke="#8A5A2A" stroke-width="2"/>
+  <circle cx="100" cy="72" r="38" fill="#C9925A" stroke="#6E4A2A" stroke-width="3.5"/>
+  <circle cx="100" cy="76" r="28" fill="#F3E2C4" stroke="#B88A5A" stroke-width="2.5"/>
+  ${state==="happy"?`<path d="M80 74q8-9 16 0M104 74q8-9 16 0" fill="none" stroke="#26342F" stroke-width="4" stroke-linecap="round"/>`:`<circle cx="88" cy="74" r="7.5" fill="#26342F"/><circle cx="112" cy="74" r="7.5" fill="#26342F"/><circle cx="91" cy="71" r="2.6" fill="#fff"/><circle cx="115" cy="71" r="2.6" fill="#fff"/>`}
+  <circle cx="88" cy="74" r="11" fill="none" stroke="#B88A5A" stroke-width="2.5"/><circle cx="112" cy="74" r="11" fill="none" stroke="#B88A5A" stroke-width="2.5"/><path d="M99 73h2" stroke="#B88A5A" stroke-width="2.5"/>
+  <ellipse cx="80" cy="88" rx="6" ry="3.5" fill="#E7A390" opacity=".75"/><ellipse cx="120" cy="88" rx="6" ry="3.5" fill="#E7A390" opacity=".75"/>
+  <path d="M93 90q7 ${state==="happy"?8:5} 14 0" stroke="#6E4A2A" stroke-width="3" fill="none" stroke-linecap="round"/>`);
+
+// ريحانة — خيّاطة قصر الأزياء: شريط قياس على الرقبة، كعكة شعر بيها قلم، ووسادة دبابيس على المعصم
+ART.rayhana = (state="idle", crop=false) => npcSVG("0 0 210 240", crop, "44 14 120 124", "ريحانة", `
+  ${crop?"":`<ellipse cx="104" cy="232" rx="58" ry="7" fill="rgba(16,32,28,.16)"/>
+  <ellipse cx="88" cy="222" rx="12" ry="7" fill="#26342F"/><ellipse cx="120" cy="222" rx="12" ry="7" fill="#26342F"/>
+  <path d="M60 216C58 166 74 128 104 128C134 128 150 166 148 216Z" fill="#2E5A50" stroke="#1B3A33" stroke-width="3.5"/>
+  <path d="M84 132h40l-4 84H88z" fill="#F5F0E3" stroke="#C7CDBE" stroke-width="2.5"/>
+  <path d="M90 150h28M92 168h24M94 186h20" stroke="#C97964" stroke-width="2" stroke-dasharray="3 3"/>
+  <ellipse cx="62" cy="166" rx="12" ry="24" transform="rotate(16 62 166)" fill="#2E5A50" stroke="#1B3A33" stroke-width="3"/>
+  <g class="arm-r"><ellipse cx="146" cy="166" rx="12" ry="24" transform="rotate(-24 146 166)" fill="#2E5A50" stroke="#1B3A33" stroke-width="3"/><circle cx="156" cy="186" r="9" fill="#C97964" stroke="#8E4E40" stroke-width="2"/><path d="M152 180l-4-6M158 179l2-7M162 184l6-3" stroke="#56645E" stroke-width="1.6"/></g>`}
+  <circle cx="104" cy="40" r="20" fill="#3E2E26" stroke="#2A1E18" stroke-width="3"/><path d="M118 26l14-14" stroke="#B88A5A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M62 90c-6-30 14-50 42-50s48 20 42 50c-8-14-22-20-42-20s-34 6-42 20z" fill="#3E2E26" stroke="#2A1E18" stroke-width="3"/>
+  <circle cx="104" cy="88" r="42" fill="#EBC6A6" stroke="#9C7456" stroke-width="3.5"/>
+  <path d="M66 84c4-20 18-28 38-28s34 8 38 28c-10-10-22-14-38-14s-28 4-38 14z" fill="#3E2E26"/>
+  ${npcEyes(88,120,94,state==="happy")}
+  <ellipse cx="74" cy="106" rx="8" ry="5" fill="#E7A390" opacity=".75"/><ellipse cx="134" cy="106" rx="8" ry="5" fill="#E7A390" opacity=".75"/>
+  <path d="M94 112q10 ${state==="happy"?9:5} 20 0" stroke="#8E4E40" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M72 128c20 14 44 14 64 0l-6 20c-14 8-38 8-52 0z" fill="#E3C9A1" stroke="#B88A5A" stroke-width="2"/>${[80,90,100,110,120,130].map(x=>`<path d="M${x} 136v4" stroke="#6E4A2A" stroke-width="1.4"/>`).join("")}`);
+
+// شوكة — قنفذ صغير بالحديقة القديمة، يحب البلوط ويضيّع قبعته
+ART.shawka = (state="idle", crop=false, cap=false) => npcSVG("0 0 200 180", crop, "30 30 140 120", "شوكة", `
+  ${crop?"":`<ellipse cx="100" cy="170" rx="66" ry="7" fill="rgba(16,32,28,.16)"/>`}
+  <path d="M30 120C24 70 60 40 104 40C150 40 178 74 172 120Z" fill="#7A6250" stroke="#4A3A2E" stroke-width="3.5"/>
+  ${Array.from({length:11},(_,i)=>{ const a=-170+i*16, r=74, cx=104+Math.cos(a*Math.PI/180)*r*.95, cy=118+Math.sin(a*Math.PI/180)*r*.95; return `<path d="M${cx.toFixed(1)} ${cy.toFixed(1)}l${(Math.cos(a*Math.PI/180)*18).toFixed(1)} ${(Math.sin(a*Math.PI/180)*18).toFixed(1)}" stroke="#4A3A2E" stroke-width="5" stroke-linecap="round"/>`; }).join("")}
+  <path d="M40 124C42 96 64 84 88 92C110 98 124 120 118 140C96 150 52 148 40 124Z" fill="#E8D2B6" stroke="#9C7A5C" stroke-width="3"/>
+  ${state==="happy"?`<path d="M62 112q6-7 12 0M86 112q6-7 12 0" fill="none" stroke="#26342F" stroke-width="3.5" stroke-linecap="round"/>`:`<circle cx="68" cy="112" r="5" fill="#26342F"/><circle cx="92" cy="112" r="5" fill="#26342F"/><circle cx="70" cy="110" r="1.8" fill="#fff"/><circle cx="94" cy="110" r="1.8" fill="#fff"/>`}
+  <circle cx="44" cy="124" r="6" fill="#26342F"/>
+  <ellipse cx="62" cy="126" rx="6" ry="3.5" fill="#E7A390" opacity=".8"/><ellipse cx="98" cy="126" rx="6" ry="3.5" fill="#E7A390" opacity=".8"/>
+  <path d="M72 132q8 6 16 0" stroke="#4A3A2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  ${cap?`<g transform="translate(56 52)"><path d="M0 26C2 8 18 0 34 0s32 8 34 26C50 32 18 32 0 26Z" fill="#8A6B4A" stroke="#4A3A2E" stroke-width="3"/><path d="M8 16h52M4 22h60" stroke="#5E4A36" stroke-width="2"/><path d="M34 0V-8" stroke="#4A3A2E" stroke-width="4" stroke-linecap="round"/></g>`:""}`);
+// قبعة شوكة: قبعة بلوط صغيرة
+ART.acornCap = () => `<svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg"><path d="M4 30C6 12 18 4 30 4s24 8 26 26C42 36 18 36 4 30Z" fill="#8A6B4A" stroke="#4A3A2E" stroke-width="2.5"/><path d="M10 20h40M6 26h48" stroke="#5E4A36" stroke-width="2"/><path d="M30 4V-2" stroke="#4A3A2E" stroke-width="3" stroke-linecap="round"/></svg>`;
+
 const NPCS = {
-  saadoun:{name:()=>"العم سعدون", color:"#7A5A3A", art:s=>ART.saadoun(s), face:m=>ART.saadoun(m===1?"happy":"idle", true)},
-  narjis:{name:()=>"الخالة نرجس", color:"#4E6A46", art:s=>ART.narjis(s), face:m=>ART.narjis(m===1?"happy":"idle", true)},
-  owl:{name:()=>"أم الحكايات", color:"#6E4A30", art:s=>ART.owl(s), face:m=>ART.owl(m===1?"happy":"idle", true)},
-  cat:{name:()=>"زعفرانة", color:"#B8662E", art:s=>ART.cat(s,false,!!(typeof WS!=="undefined" && WS.flags.catBell)), face:m=>ART.cat(m===1?"happy":"idle", true)},
-  elaf:{name:()=>heroName(), color:"#4F7350", art:()=>`<img class="girl idle" src="${GIRL}" alt="${esc(heroName())}" draggable="false">`, face:()=>`<img src="${GIRL}" alt="" style="position:absolute;width:150%;left:-25%;top:-6%">`},
-  jm:{name:()=>CONFIG.companionName, color:"#4E6A46", art:s=>ART.jaamous(s||"idle"), face:()=>ART.jmFace()},
-  sumo:{name:()=>CONFIG.guestName, color:"#9A5C72", art:s=>ART.sumo(s||"idle"), face:()=>ART.sumo("happy").replace('viewBox="0 0 200 220"','viewBox="10 10 180 180"')}
+  siraj:{name:()=>"سِراج", color:"#8A5A2A", art:s=>ART.siraj(s), face:m=>ART.siraj(m===1?"happy":"idle", true)},
+  saadoun:{name:()=>"العم سعدون", color:"#5E6B55", art:s=>ART.saadoun(s), face:m=>ART.saadoun(m===1?"happy":"idle", true)},
+  narjis:{name:()=>"الخالة نرجس", color:"#3B5C54", art:s=>ART.narjis(s), face:m=>ART.narjis(m===1?"happy":"idle", true)},
+  owl:{name:()=>"أم الحكايات", color:"#6E5A44", art:s=>ART.owl(s), face:m=>ART.owl(m===1?"happy":"idle", true)},
+  cat:{name:()=>"زعفرانة", color:"#A0603A", art:s=>ART.cat(s,false,!!(typeof WS!=="undefined" && WS.flags.catBell)), face:m=>ART.cat(m===1?"happy":"idle", true)},
+  rayhana:{name:()=>"ريحانة", color:"#2E5A50", art:s=>ART.rayhana(s), face:m=>ART.rayhana(m===1?"happy":"idle", true)},
+  shawka:{name:()=>"شوكة", color:"#6E5A44", art:s=>ART.shawka(s,false,!!(typeof WS!=="undefined" && WS.flags.capReturned)), face:m=>ART.shawka(m===1?"happy":"idle", true)}
 };
 function npcHTML(id, state="idle", cls=""){ const n=NPCS[id]; return `<div class="npc-fig npc-${id} ${cls}" data-npc="${id}">${n.art(state)}</div>`; }
 
 /* شكل خباب ويقين بالمشاهد: قصاصة الشخصية + التخصيص الإضافي (أجنحة/إكسسوار) فوقها بدون لمس اللوحة الأصلية */
 const KIDS_CUSTOM = Object.assign({k:{wings:"",acc:""}, y:{wings:"",acc:""}}, Store.get("kidsCustom",{}));
+/* تحريك بسيط مأخوذ من نفس القصاصة: الراس طبقة منفصلة تلتفت وتهز من الرقبة، والعيون ترمش، والجسم يتنفس.
+   القياسات بالنسبة المئوية لقصاصة كل شخصية (موقع الرقبة ومراكز العيون). */
+const RIG = {
+  k:{neck:20.5, px:70, eyes:[[62.5,12.5],[78.7,13.7]], ew:10.5, eh:3.0, skin:"#E9AE8C,#D58F72"},
+  y:{neck:22.9, px:33, eyes:[[26.2,13.6],[40,15.2]], ew:9.2, eh:3.4, skin:"#E4A784,#CB8A6A"}
+};
 function kidFigure(who, cls=""){
-  const c=KIDS_CUSTOM[who]||{};
+  const c=KIDS_CUSTOM[who]||{}, R=RIG[who], src=CH[who].img, [s1,s2]=R.skin.split(",");
   const acc = c.acc && ACCS[c.acc] ? `<div class="kf-acc kf-acc-${ACCS[c.acc].slot||"head"} kf-acc-${who}">${ACCS[c.acc].svg()}</div>` : "";
-  return `<div class="kidfig ${cls}" data-kid="${who}"><span class="kf-shadow"></span>${c.wings&&WINGS[c.wings]?`<div class="kf-wings">${WINGS[c.wings].svg(c.wcol||WINGS[c.wings].c)}</div>`:""}${charImg(who)}${acc}</div>`;
+  const blink = (Math.random()*4).toFixed(2);
+  return `<div class="kidfig rig ${cls}" data-kid="${who}" style="--neck:${R.neck}%;--px:${R.px}%;--blink:-${blink}s"><span class="kf-shadow"></span>${c.wings&&WINGS[c.wings]?`<div class="kf-wings">${WINGS[c.wings].svg(c.wcol||WINGS[c.wings].c)}</div>`:""}<div class="kf-rig"><img class="kid kf-body" src="${src}" alt="${esc(CH[who].name)}" draggable="false"><div class="kf-head"><img class="kid" src="${src}" alt="" draggable="false">${R.eyes.map(([x,y])=>`<i class="kf-lid" style="left:${x}%;top:${y}%;width:${R.ew}%;height:${R.eh}%;background:linear-gradient(${s1},${s2})"></i>`).join("")}</div></div>${acc}</div>`;
 }

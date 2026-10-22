@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="مغامرات خباب ويقين — موسم الخريف بعالم أيلاف: خريطة متفرعة، حكايات تنلعب، قصر أزياء، دفتر رسم، وألعاب تنلعب ويه صديق من جهازين.">
-<meta name="theme-color" content="#2B1E18">
+<meta name="description" content="مغامرات خباب ويقين: قلعة خريفية فكتورية، خريطة متفرعة، حكايات تنلعب، قصر أزياء، دفتر رسم، وألعاب تنلعب ويه صديق من جهازين.">
+<meta name="theme-color" content="#203A35">
 <title>مغامرات خباب ويقين</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Baloo+Bhaijaan+2:wght@500;700;800&family=Almarai:wght@400;700&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="assets/world_autumn_castle.png">
 <link rel="stylesheet" href="css/elaf.css">
 <link rel="stylesheet" href="css/castle.css">
 <link rel="stylesheet" href="css/world.css">
+<link rel="stylesheet" href="css/ky.css">
 </head>
 <body class="paper-tex">
 <div id="app">
@@ -21,13 +21,10 @@
     <h1 id="viewTitle">مغامرات خباب ويقين</h1>
     <span class="net-badge" id="netBadge" hidden></span>
     <button class="ibtn" id="journalBtn" aria-label="دفتر المهام"><span data-ic="quest"></span><span class="lbl">المهام</span><span class="dot-new" id="journalDot" hidden></span></button>
-    <button class="ibtn" id="mapBtn" aria-label="خريطة الحكاية"><span data-ic="map"></span><span class="lbl">الخريطة</span></button>
+    <button class="ibtn" id="mapBtn" aria-label="خريطة العالم الصغيرة"><span data-ic="map"></span><span class="lbl">الخريطة</span></button>
     <button class="ibtn" id="friendBtn" aria-label="العب مع صديق"><span data-ic="friends"></span><span class="lbl">صديق</span></button>
-    <span class="starpill" id="starPill" title="نجوم الصداقة"><span data-ic="star"></span><span id="starCount">0</span><span class="sr">نجمة صداقة</span></span>
-    <button class="ibtn" id="surpriseBtn" aria-label="فاجئيني"><span data-ic="gift"></span></button>
-    <button class="ibtn" id="soundBtn" aria-pressed="false" aria-label="الأصوات"><span data-ic="sound"></span></button>
-    <button class="ibtn" id="motionBtn" aria-pressed="false" aria-label="إيقاف حركة الخلفية"><span data-ic="calm"></span></button>
-    <button class="ibtn" id="settingsBtn" aria-label="الإعدادات"><span data-ic="gear"></span></button>
+    <span class="starpill" id="starPill" title="نجوم المغامرة"><span data-ic="star"></span><span id="starCount">0</span><span class="sr">نجمة</span></span>
+    <button class="ibtn" id="menuBtn" aria-label="القائمة" aria-haspopup="menu"><span data-ic="menu"></span></button>
   </header>
   <main id="view" aria-live="polite"></main>
 </div>
@@ -37,14 +34,12 @@
 <!-- إعدادات النشر (رابط خادم اللعب عن بعد). انظر README و .env.example -->
 <script src="site.config.js"></script>
 <script src="js/assets.js"></script>
-<script src="js/config.js"></script>
+<script src="js/ky-config.js"></script>
 <script src="js/core.js"></script>
 <script src="js/router.js"></script>
 <script src="js/characters.js"></script>
 <script src="js/npcs.js"></script>
-<script src="js/elaf-forest.js"></script>
-<script src="js/notebook.js"></script>
-<script src="js/settings.js"></script>
+<script src="js/ky-notebook.js"></script>
 <script src="js/party.js"></script>
 <script src="js/duo-kit.js"></script>
 <script src="js/castle.js"></script>
@@ -52,7 +47,8 @@
 <script src="js/tales.js"></script>
 <script src="js/world.js"></script>
 <script src="js/rooms.js"></script>
+<script src="js/opening.js"></script>
 <script src="js/duo-games.js"></script>
-<script src="js/app.js"></script>
+<script src="js/ky-app.js"></script>
 </body>
 </html>

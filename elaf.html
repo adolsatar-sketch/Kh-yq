@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>غابتنا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/elaf.css">
+</head>
+<body class="paper-tex">
+<!-- عالم أيلاف بصفحته المستقلة: غابتها وألعابها ونكتها ودفترها. منفصل عن لعبة «مغامرات خباب ويقين». -->
+<div id="app">
+  <header class="topbar" id="topbar" hidden>
+    <button class="ibtn" id="backBtn" aria-label="رجوع"><span data-ic="back"></span><span class="lbl">رجوع</span></button>
+    <h1 id="viewTitle">غابتنا</h1>
+    <span class="starpill" id="starPill" title="نجوم الصداقة"><span data-ic="star"></span><span id="starCount">0</span><span class="sr">نجمة صداقة</span></span>
+    <button class="ibtn" id="surpriseBtn" aria-label="فاجئيني"><span data-ic="gift"></span><span class="lbl">فاجئيني</span></button>
+    <button class="ibtn" id="soundBtn" aria-pressed="false" aria-label="أصوات الغابة"><span data-ic="sound"></span></button>
+    <button class="ibtn" id="motionBtn" aria-pressed="false" aria-label="إيقاف الحركة"><span data-ic="calm"></span></button>
+    <button class="ibtn" id="settingsBtn" aria-label="الإعدادات"><span data-ic="gear"></span></button>
+  </header>
+  <main id="view" aria-live="polite"></main>
+</div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<script>
+  // بيانات عالم أيلاف تنحفظ باسم مستقل (elaf_). أول مرة ننسخ مذكراتها ونجومها ورسمتها من الموقع القديم بدون ما نمسح شي.
+  window.STORE_PREFIX = "elaf_";
+  try{
+    if(!localStorage.getItem("elaf_copied")){
+      const gameOnly = /^gh_(world|tales|taleChoices|taleEnds|looks|kidsCustom|me|styleChal|journalSeen|talesArt|explore|walkTo|showTheme|hubTold)$/;
+      Object.keys(localStorage).filter(k=>k.startsWith("gh_") && !gameOnly.test(k)).forEach(k=>{ const n="elaf_"+k.slice(3); if(localStorage.getItem(n)==null) localStorage.setItem(n, localStorage.getItem(k)); });
+      localStorage.setItem("elaf_copied","1");
+    }
+  }catch(e){}
+</script>
+<script src="js/assets.js"></script>
+<script src="js/config.js"></script>
+<script src="js/core.js"></script>
+<script src="js/router.js"></script>
+<script src="js/elaf-forest.js"></script>
+<script src="js/notebook.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/elaf-app.js"></script>
+</body>
+</html>

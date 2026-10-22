@@ -1,19 +1,19 @@
 /* ============ storage (safe) ============ */
+// كل موقع إله بادئة حفظ خاصة حتى ما تختلط بياناته (عالم أيلاف يستعمل elaf_)
+const STORE_PREFIX = window.STORE_PREFIX || "gh_";
 const Store = (() => {
   let ok = true, mem = {};
   try { const k="__gh_t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); } catch(e){ ok = false; }
   return {
     ok,
-    get(k, d){ try{ const v = ok ? localStorage.getItem("gh_"+k) : mem[k]; return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
-    set(k, v){ const s = JSON.stringify(v); if(!ok){ mem[k]=s; return true; } try{ localStorage.setItem("gh_"+k, s); return true; }catch(e){ toast("ما قدرت أحفظ — مساحة الجهاز ممتلئة"); return false; } },
-    del(k){ try{ ok ? localStorage.removeItem("gh_"+k) : delete mem[k]; }catch(e){} },
-    clearAll(){ try{ Object.keys(localStorage).filter(k=>k.startsWith("gh_")).forEach(k=>localStorage.removeItem(k)); }catch(e){} mem={}; }
+    get(k, d){ try{ const v = ok ? localStorage.getItem(STORE_PREFIX+k) : mem[k]; return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+    set(k, v){ const s = JSON.stringify(v); if(!ok){ mem[k]=s; return true; } try{ localStorage.setItem(STORE_PREFIX+k, s); return true; }catch(e){ toast("ما قدرت أحفظ — مساحة الجهاز ممتلئة"); return false; } },
+    del(k){ try{ ok ? localStorage.removeItem(STORE_PREFIX+k) : delete mem[k]; }catch(e){} },
+    clearAll(){ try{ Object.keys(localStorage).filter(k=>k.startsWith(STORE_PREFIX)).forEach(k=>localStorage.removeItem(k)); }catch(e){} mem={}; }
   };
 })();
 
-const settings = Object.assign({heroName:CONFIG.heroName, welcome:CONFIG.welcome, siteTitle:CONFIG.siteTitle, accent:CONFIG.accent, theme:"auto", secretLetter:CONFIG.secretLetter}, Store.get("settings", {}));
 const prefs = Object.assign({sound:false, calm:false}, Store.get("prefs", {}));
-const heroName = () => settings.heroName || CONFIG.heroFallback;
 
 /* ============ helpers ============ */
 const $ = (s, r=document) => r.querySelector(s);
@@ -60,6 +60,7 @@ const IC = {
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
   lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
   quest:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M9 9h6M9 13h6M9 17h3"/><path d="M15 3v4h4"/></svg>',
   map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>',
   friends:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="3.2"/><circle cx="16.5" cy="9" r="2.6"/><path d="M2.5 20c.6-3.6 2.8-5.5 5.5-5.5s4.9 1.9 5.5 5.5M13.5 15.2c.9-.8 1.9-1.2 3-1.2 2.3 0 4 1.6 4.5 4.5"/></svg>',
@@ -70,50 +71,6 @@ function fillIcons(root=document){ $$("[data-ic]", root).forEach(el=>{ el.innerH
 
 /* ============ original art (SVG) ============ */
 const ART = {};
-// جعموص — دمية قماشية أصلية جالسة: راس كبير مدوّر، جسم صغير، ورقة عسلية فوق الراس
-ART.jaamous = (state="idle") => {
-  const eyes = state==="happy"
-    ? '<path d="M64 100q12-14 24 0M112 100q12-14 24 0" fill="none" stroke="#2F2A20" stroke-width="6" stroke-linecap="round"/>'
-    : `<g><circle cx="76" cy="100" r="15" fill="#2F2A20"/><circle cx="124" cy="100" r="15" fill="#2F2A20"/><circle cx="${state==="think"?80:71}" cy="${state==="think"?92:94}" r="5" fill="#fff"/><circle cx="${state==="think"?128:119}" cy="${state==="think"?92:94}" r="5" fill="#fff"/><circle cx="${state==="think"?84:80}" cy="104" r="2" fill="#fff" opacity=".7"/><rect class="lid" x="59" y="83" width="34" height="34" rx="17" fill="#9DBF8E"/><rect class="lid" x="107" y="83" width="34" height="34" rx="17" fill="#9DBF8E"/></g>`;
-  const mouth = state==="happy" ? '<path d="M84 124q16 20 32 0z" fill="#8E4536" stroke="#2F2A20" stroke-width="3" stroke-linejoin="round"/><path d="M92 132q8 5 16 0" fill="#E9A79E"/>'
-    : state==="think" ? '<path d="M92 128q8-4 16 0" fill="none" stroke="#2F2A20" stroke-width="4" stroke-linecap="round"/>'
-    : '<path d="M86 124q14 12 28 0" fill="none" stroke="#2F2A20" stroke-width="4" stroke-linecap="round"/>';
-  return `<svg class="jm jm-${state}" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CONFIG.companionName}">
-  <ellipse cx="100" cy="212" rx="70" ry="7" fill="rgba(60,50,30,.16)"/>
-  <ellipse cx="66" cy="196" rx="26" ry="16" fill="#7FA374" stroke="#4E6A46" stroke-width="3.5"/>
-  <ellipse cx="134" cy="196" rx="26" ry="16" fill="#7FA374" stroke="#4E6A46" stroke-width="3.5"/>
-  <ellipse cx="58" cy="196" rx="10" ry="8" fill="#F4EBD0" opacity=".9"/><ellipse cx="142" cy="196" rx="10" ry="8" fill="#F4EBD0" opacity=".9"/>
-  <ellipse cx="100" cy="172" rx="48" ry="34" fill="#93B886" stroke="#4E6A46" stroke-width="3.5"/>
-  <ellipse cx="100" cy="176" rx="24" ry="17" fill="#F4EBD0" stroke="#C9B98E" stroke-width="2.5"/>
-  <ellipse cx="100" cy="176" rx="18" ry="12" fill="none" stroke="#C9B98E" stroke-width="2" stroke-dasharray="3 4"/>
-  <ellipse cx="50" cy="166" rx="14" ry="20" transform="rotate(30 50 166)" fill="#88AC7E" stroke="#4E6A46" stroke-width="3.5"/>
-  <g class="arm-r"><ellipse cx="150" cy="166" rx="14" ry="20" transform="rotate(-30 150 166)" fill="#88AC7E" stroke="#4E6A46" stroke-width="3.5"/></g>
-  <circle cx="100" cy="94" r="72" fill="#9DBF8E" stroke="#4E6A46" stroke-width="3.5"/>
-  <path d="M100 24V56" stroke="#4E6A46" stroke-width="2.5" stroke-dasharray="5 5"/>
-  <path d="M40 120q60 30 120 0" stroke="#4E6A46" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".5"/>
-  <rect x="140" y="60" width="18" height="16" rx="3" transform="rotate(14 149 68)" fill="#B9A6DD" stroke="#7F6AA8" stroke-width="2"/>
-  <path d="M144 64l9 7M153 64l-9 7" stroke="#7F6AA8" stroke-width="2" transform="rotate(14 149 68)"/>
-  <path d="M100 24C98 14 100 8 106 2" stroke="#7A5A3A" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M104 8C120-6 148-2 152 12C136 24 116 22 104 8Z" fill="#E8C066" stroke="#B88F33" stroke-width="2.5"/>
-  <path d="M108 9C122 6 136 8 148 12" stroke="#B88F33" stroke-width="2" fill="none"/>
-  <ellipse cx="56" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><ellipse cx="144" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/>
-  ${eyes}${mouth}
-  </svg>`;
-};
-ART.jmFace = () => `<svg viewBox="20 -6 160 180" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="94" r="72" fill="#9DBF8E" stroke="#4E6A46" stroke-width="5"/><circle cx="76" cy="100" r="15" fill="#2F2A20"/><circle cx="124" cy="100" r="15" fill="#2F2A20"/><circle cx="71" cy="94" r="5" fill="#fff"/><circle cx="119" cy="94" r="5" fill="#fff"/><path d="M86 124q14 12 28 0" fill="none" stroke="#2F2A20" stroke-width="5" stroke-linecap="round"/><ellipse cx="56" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><ellipse cx="144" cy="122" rx="12" ry="7" fill="#E9A79E" opacity=".75"/><path d="M104 8C120-6 148-2 152 12C136 24 116 22 104 8Z" fill="#E8C066" stroke="#B88F33" stroke-width="3"/></svg>`;
-// سومو — ضيف أصلي: فطر صغير ممتلئ بقبعة وردية منقّطة
-ART.sumo = (state="idle") => `<svg class="sumo" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CONFIG.guestName}">
-  <ellipse cx="100" cy="210" rx="52" ry="7" fill="rgba(60,50,30,.16)"/>
-  <ellipse cx="78" cy="200" rx="16" ry="10" fill="#C9A77E" stroke="#8C6C48" stroke-width="3"/><ellipse cx="122" cy="200" rx="16" ry="10" fill="#C9A77E" stroke="#8C6C48" stroke-width="3"/>
-  <path d="M56 110C52 160 62 198 100 198C138 198 148 160 144 110Z" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3.5"/>
-  <ellipse cx="48" cy="146" rx="12" ry="18" transform="rotate(20 48 146)" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3"/>
-  <ellipse cx="152" cy="146" rx="12" ry="18" transform="rotate(-20 152 146)" fill="#F3E6C8" stroke="#8C6C48" stroke-width="3"/>
-  <path d="M18 108C20 52 62 22 100 22C138 22 180 52 182 108C150 120 50 120 18 108Z" fill="#D99BB0" stroke="#9A5C72" stroke-width="3.5"/>
-  <circle cx="64" cy="66" r="11" fill="#FBF3E3"/><circle cx="104" cy="44" r="9" fill="#FBF3E3"/><circle cx="142" cy="72" r="12" fill="#FBF3E3"/><circle cx="40" cy="96" r="7" fill="#FBF3E3"/><circle cx="164" cy="98" r="6" fill="#FBF3E3"/>
-  ${state==="happy" ? '<path d="M78 142q7-8 14 0M108 142q7-8 14 0" fill="none" stroke="#2F2A20" stroke-width="4.5" stroke-linecap="round"/>' : '<circle cx="85" cy="142" r="6.5" fill="#2F2A20"/><circle cx="115" cy="142" r="6.5" fill="#2F2A20"/><circle cx="87" cy="140" r="2" fill="#fff"/><circle cx="117" cy="140" r="2" fill="#fff"/>'}
-  <ellipse cx="72" cy="156" rx="8" ry="5" fill="#E9A79E" opacity=".7"/><ellipse cx="128" cy="156" rx="8" ry="5" fill="#E9A79E" opacity=".7"/>
-  <path d="M93 158q7 7 14 0" fill="none" stroke="#2F2A20" stroke-width="3.5" stroke-linecap="round"/>
-</svg>`;
 ART.butterfly = (c1="#B9A6DD", c2="#E8C066") => `<svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg"><g class="wing"><path d="M30 25C20 6 4 6 6 20C7 30 20 30 30 26Z" fill="${c1}" stroke="#5E4D86" stroke-width="1.6"/><path d="M30 26C20 30 10 40 16 45C22 48 28 36 30 28Z" fill="${c2}" stroke="#5E4D86" stroke-width="1.6"/><path d="M30 25C40 6 56 6 54 20C53 30 40 30 30 26Z" fill="${c1}" stroke="#5E4D86" stroke-width="1.6"/><path d="M30 26C40 30 50 40 44 45C38 48 32 36 30 28Z" fill="${c2}" stroke="#5E4D86" stroke-width="1.6"/></g><rect x="28.5" y="16" width="3" height="20" rx="1.5" fill="#4A3E5E"/><path d="M30 17q-4-8-7-9M30 17q4-8 7-9" stroke="#4A3E5E" stroke-width="1.4" fill="none"/></svg>`;
 ART.bird = () => `<svg viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="30" rx="18" ry="15" fill="#8EC3CF" stroke="#4E8E9C" stroke-width="2"/><path d="M26 30q8 10 18 0q-8-2-18 0z" fill="#6FAAB8" stroke="#4E8E9C" stroke-width="1.6"/><circle cx="20" cy="25" r="2.6" fill="#2F2A20"/><path d="M12 28l-7 2 7 2z" fill="#E8C066" stroke="#B88F33" stroke-width="1.2"/><ellipse cx="24" cy="34" rx="6" ry="4" fill="#F4EBD0"/><path d="M26 45v3M32 45v3" stroke="#B88F33" stroke-width="2" stroke-linecap="round"/></svg>`;
 ART.rabbit = () => `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><ellipse cx="22" cy="14" rx="5" ry="13" fill="#F4EBD0" stroke="#9C8A68" stroke-width="2"/><ellipse cx="34" cy="13" rx="5" ry="13" transform="rotate(12 34 13)" fill="#F4EBD0" stroke="#9C8A68" stroke-width="2"/><ellipse cx="22" cy="15" rx="2" ry="8" fill="#E9A79E"/><ellipse cx="30" cy="42" rx="18" ry="15" fill="#F4EBD0" stroke="#9C8A68" stroke-width="2"/><circle cx="29" cy="30" r="12" fill="#F4EBD0" stroke="#9C8A68" stroke-width="2"/><circle cx="25" cy="28" r="2" fill="#2F2A20"/><circle cx="33" cy="28" r="2" fill="#2F2A20"/><path d="M27 33q2 2 4 0" stroke="#2F2A20" stroke-width="1.5" fill="none"/><circle cx="47" cy="46" r="5" fill="#fff" stroke="#9C8A68" stroke-width="1.5"/></svg>`;
@@ -159,10 +116,7 @@ const STICKERS = {
   star:{label:"نجمة", src:svgURL(ART.starB())},
   butterfly:{label:"فراشة", src:svgURL(ART.butterfly())},
   mushroom:{label:"فطر", src:svgURL(ART.mushroom())},
-  heart:{label:"قلب", src:svgURL(ART.heart())},
-  jaamous:{label:CONFIG.companionName, src:svgURL(ART.jaamous("happy"))},
-  sumo:{label:CONFIG.guestName, src:svgURL(ART.sumo("happy")), lock:"sumo"},
-  hero:{label:CONFIG.heroName||"البطلة", src:GIRL, lock:"hero"}
+  heart:{label:"قلب", src:svgURL(ART.heart())}
 };
 const IMG = {};
 function loadImg(key, src){ if(IMG[key]) return IMG[key]; const im = new Image(); im.decoding="async"; im.src = src; IMG[key]=im; return im; }
@@ -184,6 +138,12 @@ const Sound = (() => {
     bump(){ tone(180,90,.18,"triangle",.1); }, note(f){ tone(f,f*1.01,.28,"triangle",.09); }, soft(){ tone(400,600,.1,"sine",.05); }
   };
 })();
+
+/* ============ shared helpers (عالم أيلاف ولعبة خباب ويقين) ============ */
+function react(el, cls){ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 1100); }
+function catmull(pts){ let d=`M${pts[0][0]} ${pts[0][1]}`; for(let i=0;i<pts.length-1;i++){ const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2; const c1=[p1[0]+(p2[0]-p0[0])/6, p1[1]+(p2[1]-p0[1])/6], c2=[p2[0]-(p3[0]-p1[0])/6, p2[1]-(p3[1]-p1[1])/6]; d+=` C${c1[0].toFixed(2)} ${c1[1].toFixed(2)} ${c2[0].toFixed(2)} ${c2[1].toFixed(2)} ${p2[0]} ${p2[1]}`; } return d; }
+const pick = a => a[Math.floor(Math.random()*a.length)];
+function rateStars(n){ return `<span class="rate" aria-label="${n} من 3">${[1,2,3].map(i=>`<span class="${i<=n?"on":""}">${IC.star}</span>`).join("")}</span>`; }
 
 /* ============ UI primitives ============ */
 function toast(msg, icon="star"){ const t=h(`<div class="toast panel" role="status">${IC[icon]||""}<span>${esc(msg)}</span></div>`); document.body.appendChild(t); setTimeout(()=>t.remove(), 2700); }

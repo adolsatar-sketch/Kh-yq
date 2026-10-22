@@ -1,6 +1,6 @@
 /* ============ v3 core: assets, characters, dialogue ============ */
 const CH = {
-  k:{name:"خباب", img:BOY, color:"#9B3B2E", trait:"مبادر ومرح", faces:[[15,1240,160,250],[170,1240,160,250],[335,1240,165,250]]},
+  k:{name:"خباب", img:BOY, color:"#A65A48", trait:"مبادر ومرح", faces:[[15,1240,160,250],[170,1240,160,250],[335,1240,165,250]]},
   y:{name:"يقين", img:GIRLY, color:"#2F5E57", trait:"فضولية وذكية", faces:[[515,1240,170,250],[685,1240,165,250],[850,1240,170,250]]}
 };
 // face: 0 = هادئ، 1 = فرحان، 2 = يفكّر — عرض جزء من لوحة الشخصيات الأصلية بدون تعديل الملف
@@ -21,17 +21,22 @@ const speakerName = w => CH[w] ? CH[w].name : (NPCS[w] ? NPCS[w].name() : "");
 const speakerColor = w => CH[w] ? CH[w].color : (NPCS[w] ? NPCS[w].color : "#2E2118");
 function dialogue(host, lines, done){
   lines = lines.slice(); let i=0, closed=false;
-  const box=h(`<div class="dlg panel" role="dialog" aria-live="polite"><div class="dlg-face"></div><div class="dlg-body"><b class="dlg-name"></b><p class="dlg-text"></p><div class="dlg-opts" hidden></div></div><button class="btn small dlg-next">التالي</button></div>`);
+  const box=h(`<div class="dlg panel" role="dialog" aria-live="polite"><div class="dlg-face"></div><div class="dlg-body"><b class="dlg-name"></b><p class="dlg-text"></p><div class="dlg-opts" hidden></div></div><div class="dlg-tools"><button class="btn small dlg-next">التالي</button><button class="dlg-skip" type="button">تخطّي</button><button class="dlg-hide" type="button" aria-label="تصغير الحوار">إخفاء</button></div></div>`);
   host.appendChild(box);
-  const nextBtn=$(".dlg-next",box), opts=$(".dlg-opts",box);
+  const nextBtn=$(".dlg-next",box), opts=$(".dlg-opts",box), skipBtn=$(".dlg-skip",box), hideBtn=$(".dlg-hide",box);
+  // تخطّي: يقفز للاختيار الجاي (الاختيارات تغيّر القصة فما تنتخطّى) أو ينهي الحوار
+  skipBtn.onclick=e=>{ e.stopPropagation(); let j=i; while(j<lines.length && Array.isArray(lines[j])) j++; if(j>=lines.length){ close(); done&&done(); } else { i=j; show(); } };
+  // إخفاء: الحوار يصغر لوجه بس، وبالضغط عليه يرجع
+  hideBtn.onclick=e=>{ e.stopPropagation(); box.classList.add("mini"); hideBtn.textContent="إظهار"; };
+  box.addEventListener("click", e=>{ if(box.classList.contains("mini") && !e.target.closest(".dlg-opt")){ box.classList.remove("mini"); hideBtn.textContent="إخفاء"; } });
   const show=()=>{
     const L=lines[i]; const isAsk = !Array.isArray(L);
     const w = isAsk ? (L.who||"y") : L[0], m = isAsk ? 2 : L[1], t = isAsk ? L.ask : L[2];
-    $(".dlg-face",box).innerHTML=speakerFace(w,m,72);
+    $(".dlg-face",box).innerHTML=speakerFace(w,m,56);
     const nm=$(".dlg-name",box); nm.textContent=speakerName(w); nm.style.color=speakerColor(w);
     $(".dlg-text",box).textContent = typeof t==="function" ? t() : t;
     box.dataset.who = CH[w] ? w : "npc";
-    opts.hidden = !isAsk; nextBtn.hidden = isAsk;
+    opts.hidden = !isAsk; nextBtn.hidden = isAsk; skipBtn.hidden = isAsk || i===lines.length-1;
     if(isAsk){
       opts.innerHTML = L.opts.map((o,k)=>`<button class="btn ghost small dlg-opt" data-o="${k}"><span class="dlg-k">${k+1}</span>${esc(o.t)}</button>`).join("");
       $$(".dlg-opt",opts).forEach(b=>b.onclick=()=>choose(+b.dataset.o));
@@ -50,7 +55,7 @@ function dialogue(host, lines, done){
 }
 function leafLayer(n=14, cls=""){
   if(!motionOK()) return `<div class="ambient ${cls}"></div>`;
-  const cols=["#C8552B","#E08A2E","#B33A26","#D9A53A","#8E3B22"];
+  const cols=["#C9A27A","#B9805F","#C97964","#D7B58C","#A8B9A0"];
   let s=`<div class="ambient ${cls}" aria-hidden="true">`;
   for(let i=0;i<n;i++) s+=`<span class="leaf-f maple" style="left:${Math.random()*100}%;animation-duration:${9+Math.random()*9}s;animation-delay:${-Math.random()*18}s;width:${16+Math.random()*16}px">${ART.maple(cols[i%5])}</span>`;
   return s+"</div>";
