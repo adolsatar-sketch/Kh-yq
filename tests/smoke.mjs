@@ -30,8 +30,8 @@ for(const [w,h] of [[1280,760],[390,844]]){
 }
 // اللعبة ما تذكر أيلاف أو جعموص أو سومو بأي نص ظاهر
 { const c=await b.newContext({viewport:{width:1280,height:760}}); const p=await c.newPage(); await p.goto(U+'#world'); await p.waitForTimeout(800);
-  const hits=[]; for(const r of routes){ await p.evaluate(r=>{ location.hash=r; location.reload(); }, r).catch(()=>{}); await p.waitForTimeout(700); const t=await p.evaluate(()=>document.body.innerText); if(/أيلاف|إيلاف|ايلاف|جعموص|سومو/.test(t)) hits.push(r); }
-  console.log('Elaf/Jaamous/Sumo mentions in game text:', hits.length?hits.join(','):'none'); await c.close(); }
+  const hits=[], sheet=[]; for(const r of routes){ await p.evaluate(r=>{ location.hash=r; location.reload(); }, r).catch(()=>{}); await p.waitForTimeout(700); const t=await p.evaluate(()=>document.body.innerText); if(/أيلاف|إيلاف|ايلاف|جعموص|سومو/.test(t)) hits.push(r); if(await p.evaluate(()=>document.body.innerHTML.includes('khabbab_yaqeen_characters'))) sheet.push(r); }
+  console.log('Elaf/Jaamous/Sumo mentions in game text:', hits.length?hits.join(','):'none'); console.log('character sheet shown on:', sheet.length?sheet.join(','):'none'); await c.close(); }
 // صفحة عالم أيلاف المستقلة
 { const c=await b.newContext({viewport:{width:1280,height:760}}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   for(const r of ["open","map","forestintro","jokes","cave","book","paint","diary",...["fireflies","basket","dance","madlibs","memory","story","road","logic","bubbles"].map(g=>"game:"+g)]){ await p.goto((process.env.BASE||'http://localhost:8787/')+'elaf.html#'+r); await p.waitForTimeout(600); }

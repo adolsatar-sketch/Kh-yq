@@ -3,10 +3,12 @@ const CH = {
   k:{name:"خباب", img:BOY, color:"#A65A48", trait:"مبادر ومرح", faces:[[15,1240,160,250],[170,1240,160,250],[335,1240,165,250]]},
   y:{name:"يقين", img:GIRLY, color:"#2F5E57", trait:"فضولية وذكية", faces:[[515,1240,170,250],[685,1240,165,250],[850,1240,170,250]]}
 };
-// face: 0 = هادئ، 1 = فرحان، 2 = يفكّر — عرض جزء من لوحة الشخصيات الأصلية بدون تعديل الملف
+// الوجه من القصاصة النظيفة نفسها (خلفية شفافة)، مو من لوحة الشخصيات المركبة.
+// mood: 0 = هادئ، 1 = فرحان، 2 = يفكّر — ميلان خفيف للرأس بدل شريط تعابير
+const FACE_BOX = {k:{img:BOY, w:371, h:1000, x:138, y:22, s:228}, y:{img:GIRLY, w:420, h:896, x:22, y:40, s:218}};
 function faceHTML(who, mood=0, size=64){
-  const [x,y,w,hh] = CH[who].faces[mood]; const sc = size/w;
-  return `<span class="cameo" style="width:${size}px;height:${Math.round(hh*sc*.78)}px"><span style="background-image:url(${SHEET});background-size:${1024*sc}px ${1536*sc}px;background-position:${-x*sc}px ${-(y+8)*sc}px"></span></span>`;
+  const F=FACE_BOX[who], sc=size/F.s, tilt=["0deg","-5deg","6deg"][mood]||"0deg";
+  return `<span class="cameo face-${who} mood-${mood}" style="width:${size}px;height:${size}px"><span style="background-image:url(${F.img});background-size:${(F.w*sc).toFixed(1)}px ${(F.h*sc).toFixed(1)}px;background-position:${(-F.x*sc).toFixed(1)}px ${(-F.y*sc).toFixed(1)}px;transform:rotate(${tilt})"></span></span>`;
 }
 function charImg(who, cls="", alt){ return `<img class="kid ${cls}" src="${CH[who].img}" alt="${esc(alt||CH[who].name)}" draggable="false">`; }
 function kidAct(el, act){ if(!el) return; const cls="act-"+act; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 1300); }
