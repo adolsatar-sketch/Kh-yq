@@ -7,14 +7,14 @@
 const PEER_CDN = "https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js";
 const Party = (() => {
   const me = Object.assign({name:"", char:"y"}, Store.get("me", {}));
-  const P = { me, state:"off", isHost:false, code:"", peer:null, other:null, ready:{me:false, other:false}, game:null, listeners:{}, transport:"", lastErr:"", peerAway:false, friendAt:null };
+  const P = { me, state:"off", isHost:false, code:"", peer:null, other:null, ready:{me:false, other:false}, listeners:{}, transport:"", lastErr:"", peerAway:false, friendAt:null };
   const emitLocal = (t, d) => (P.listeners[t]||[]).slice().forEach(fn=>{ try{ fn(d); }catch(e){ console.error(e); } });
   P.on = (t, fn) => { (P.listeners[t] ||= []).push(fn); return () => { P.listeners[t] = (P.listeners[t]||[]).filter(f=>f!==fn); }; };
   P.connected = () => P.state==="connected";
   P.saveMe = () => Store.set("me", me);
   let conn=null, roomNs=null, retryT=null, pingT=null, lastSeen=0, peerLib=null;
   let ws=null, wsToken="", wsClosing=false, wsTries=0, wsResolve=null;
-  function setState(s, err){ P.state=s; if(err) P.lastErr=err; emitLocal("status", s); }
+  function setState(s, err){ P.state=s; if(err) P.lastErr=err; if(s==="error"||s==="lost"){ try{ sessionStorage.removeItem("khy_room"); }catch(e){} } emitLocal("status", s); }
   function hello(){ return {t:"hello", name:me.name, char:me.char}; }
   function deliver(msg){
     lastSeen=Date.now();
@@ -24,7 +24,8 @@ const Party = (() => {
       if(!P.isHost && P.other.char===me.char){ me.char = me.char==="k"?"y":"k"; P.saveMe(); send(hello()); setTimeout(()=>toast("صاحبك اختار "+CH[P.other.char].name+"، فإنتِ صرتي "+CH[me.char].name,"check"),100); }
       if(P.isHost && P.other.char===me.char){ P.other.char = me.char==="k"?"y":"k"; }
       const was=P.state; setState("connected");
-      if(P.isHost && !msg.re){ send(Object.assign(hello(),{re:1})); if(P.game) send({t:"sync", game:P.game, snap:P.snapshot?P.snapshot():null}); }
+      // أي طرف يستلم «هلا» أول مرة يرد عليها، وصاحب الغرفة يرسل حالة اللعبة الحالية
+      if(!msg.re){ send(Object.assign(hello(),{re:1})); if(P.isHost && P.game) send({t:"sync", game:P.game, snap:P.snapshot?P.snapshot():null}); }
       if(was!=="connected") toast("صاحبك "+P.other.name+" وياكم!","friends");
     }
     else if(msg.t==="ready"){ P.ready.other=!!msg.v; emitLocal("ready"); }
@@ -36,8 +37,10 @@ const Party = (() => {
   P.send = msg => send(msg);
   const mkCode = () => { const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789"; let s=""; for(let i=0;i<5;i++) s+=A[Math.floor(Math.random()*A.length)]; return s; };
   const ERR = {not_found:"ما لگينا الغرفة. تأكدوا من الرمز، أو خلّي صاحبك يفتح غرفة جديدة.", expired:"الغرفة انتهت. خلّي صاحبك يفتح غرفة جديدة.", full:"الغرفة مليانة — بيها لاعبين.", too_big:"رسالة كبيرة هواية.", net:"ما گدرنا نتصل بخادم اللعب. تأكدوا من الإنترنت."};
-  const session = { get(){ try{ return JSON.parse(sessionStorage.getItem("khy_room")||"null"); }catch(e){ return null; } }, set(v){ try{ v ? sessionStorage.setItem("khy_room", JSON.stringify(v)) : sessionStorage.removeItem("khy_room"); }catch(e){} } };
+    const session = { get(){ try{ return JSON.parse(sessionStorage.getItem("khy_room")||"null"); }catch(e){ return null; } }, set(v){ try{ v ? sessionStorage.setItem("khy_room", JSON.stringify(v)) : sessionStorage.removeItem("khy_room"); }catch(e){} } };
 
+  let _game=null;
+  Object.defineProperty(P, "game", {get:()=>_game, set:v=>{ _game=v; const s=session.get(); if(s){ s.game=v; session.set(s); } }});
   /* ---------- 1) خادم WebSocket ---------- */
   function relayURL(){
     const u = ((window.KY_CONFIG||{}).relayUrl||"").trim(); if(!u) return "";
@@ -58,8 +61,8 @@ const Party = (() => {
   }
   function onRelay(m){
     const done=v=>{ if(wsResolve){ const r=wsResolve; wsResolve=null; r(v); } };
-    if(m.op==="created"){ P.code=m.code; wsToken=m.token; session.set({code:P.code, token:wsToken, host:true}); setState("waiting"); done(true); }
-    else if(m.op==="joined"){ P.code=m.code; wsToken=m.token; P.isHost = m.slot==="A"; session.set({code:P.code, token:wsToken, host:P.isHost});
+    if(m.op==="created"){ P.code=m.code; wsToken=m.token; session.set({code:P.code, token:wsToken, host:true, game:_game}); setState("waiting"); done(true); }
+    else if(m.op==="joined"){ P.code=m.code; wsToken=m.token; P.isHost = m.slot==="A"; session.set({code:P.code, token:wsToken, host:P.isHost, game:_game});
       if(m.peer && m.peer.online){ P.peerAway=false; send(hello()); setState(P.other?"connected":"joining"); if(P.isHost && P.game) send({t:"sync", game:P.game, snap:P.snapshot?P.snapshot():null}); }
       else if(m.peer){ P.peerAway=true; setState("reconnecting", "صاحبك انقطع… ننتظره يرجع."); }
       else setState(P.isHost?"waiting":"joining");
@@ -86,7 +89,7 @@ const Party = (() => {
   function bindConn(c){
     conn=c; c.on("open", ()=>{ clearTimeout(retryT); if(!P.isHost) send(hello()); });
     c.on("data", deliver);
-    c.on("close", ()=>{ if(P.state==="off") return; setState("reconnecting","انقطع الاتصال… نرجّعه."); if(!P.isHost) scheduleRetry(); });
+    c.on("close", ()=>{ if(P.state==="off" || conn!==c) return; if(P.isHost){ P.peerAway=true; setState("reconnecting","صاحبك انقطع… ننتظره يرجع."); } else { setState("reconnecting","انقطع الاتصال… نرجّعه."); scheduleRetry(); } });
     c.on("error", ()=>{});
   }
   function scheduleRetry(n=0){ clearTimeout(retryT); if(n>30){ setState("lost","انقطع الاتصال ولم يرجع. جرّبوا غرفة جديدة."); return; } retryT=setTimeout(()=>{ if(P.state==="connected"||P.state==="off") return; try{ bindConn(P.peer.connect("khy-"+P.code,{reliable:true})); }catch(e){} scheduleRetry(n+1); }, 2000); }
@@ -100,19 +103,33 @@ const Party = (() => {
     return true;
   }
 
+  // PeerJS: صاحب الغرفة يسجّل بالاسم khy-CODE والضيف يتصل بيه
+  async function peerHost(fixed){
+    const Peer = await loadPeer(); P.transport="peer";
+    const open = id => new Promise((res,rej)=>{ const pr = new Peer("khy-"+id, {debug:0}); pr.on("open", ()=>res(pr)); pr.on("error", e=>{ try{ pr.destroy(); }catch(x){} rej(e); }); });
+    let pr;
+    for(let i=0;i<(fixed?12:3);i++){ try{ pr = await open(P.code); break; }catch(e){ if(e && e.type==="unavailable-id"){ if(fixed){ await new Promise(r=>setTimeout(r,2500)); continue; } P.code=mkCode(); continue; } throw e; } }
+    if(!pr) throw new Error("id");
+    P.peer=pr; pr.on("connection", c=>{ if(conn && conn.open && conn!==c && !P.peerAway){ c.on("open",()=>{ c.send({t:"full"}); setTimeout(()=>c.close(),300); }); return; } bindConn(c); });
+    pr.on("disconnected", ()=>{ try{ pr.reconnect(); }catch(e){} });
+    pr.on("error", e=>{ if(e && e.type==="network") setState("reconnecting","انقطع الاتصال… نرجّعه."); });
+    session.set({code:P.code, host:true, t:"peer", game:_game});
+  }
+  async function peerGuest(code){
+    const Peer = await loadPeer(); P.transport="peer";
+    const pr = new Peer(undefined, {debug:0}); P.peer=pr;
+    await new Promise((res,rej)=>{ pr.on("open",res); pr.on("error",rej); });
+    pr.on("error", e=>{ if(e && e.type==="peer-unavailable"){ if(P.state==="joining") setState("error","ما لگينا الغرفة. يمكن الرمز غلط أو الغرفة انتهت."); } else if(e && e.type==="network") setState("reconnecting","انقطع الاتصال… نرجّعه."); });
+    const c=pr.connect("khy-"+code, {reliable:true}); bindConn(c);
+    c.on("open", ()=>session.set({code, host:false, t:"peer", game:_game}));
+  }
   P.create = async () => {
     P.leave(true); P.isHost=true; P.code=""; P.ready={me:false,other:false}; setState("opening");
     if(relayURL()){ const ok=await relayOpen({op:"create"}); if(ok) return P.code; if(P.state==="error") return null; }
     P.code=mkCode();
     if(await viaRoom(P.code)){ startPing(); return P.code; }
-    try{ const Peer = await loadPeer(); P.transport="peer";
-      const open = id => new Promise((res,rej)=>{ const pr = new Peer("khy-"+id, {debug:0}); pr.on("open", ()=>res(pr)); pr.on("error", e=>rej(e)); });
-      let pr; for(let i=0;i<3;i++){ try{ pr = await open(P.code); break; }catch(e){ if(e && e.type==="unavailable-id"){ P.code=mkCode(); continue; } throw e; } }
-      P.peer=pr; pr.on("connection", c=>{ if(conn && conn.open && conn!==c){ c.on("open",()=>{ c.send({t:"full"}); setTimeout(()=>c.close(),300); }); return; } bindConn(c); });
-      pr.on("disconnected", ()=>{ try{ pr.reconnect(); }catch(e){} });
-      pr.on("error", e=>{ if(e && e.type==="network") setState("reconnecting","انقطع الاتصال… نرجّعه."); });
-      setState("waiting"); startPing(); return P.code;
-    }catch(e){ setState("error", e && e.type==="browser-incompatible" ? "المتصفح ما يدعم الاتصال المباشر." : "ما گدرنا نفتح غرفة. تأكدوا من الإنترنت وجرّبوا مرة ثانية."); return null; }
+    try{ await peerHost(false); setState("waiting"); startPing(); return P.code; }
+    catch(e){ setState("error", e && e.type==="browser-incompatible" ? "المتصفح ما يدعم الاتصال المباشر." : "ما گدرنا نفتح غرفة. تأكدوا من الإنترنت وجرّبوا مرة ثانية."); return null; }
   };
   P.join = async raw => {
     const code = String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5);
@@ -120,17 +137,17 @@ const Party = (() => {
     P.leave(true); P.isHost=false; P.code=code; P.ready={me:false,other:false}; setState("joining");
     if(relayURL()){ P.code=""; const ok=await relayOpen({op:"join", code}); return ok; }
     if(await viaRoom(code)){ startPing(); setTimeout(()=>{ if(P.state==="joining") setState("error","ما لگينا الغرفة. تأكدوا من الرمز أو خلّي صاحبك يفتح الغرفة من جديد."); }, 12000); return true; }
-    try{ const Peer = await loadPeer(); P.transport="peer";
-      const pr = new Peer(undefined, {debug:0}); P.peer=pr;
-      await new Promise((res,rej)=>{ pr.on("open",res); pr.on("error",rej); });
-      pr.on("error", e=>{ if(e && e.type==="peer-unavailable"){ if(P.state==="joining") setState("error","ما لگينا الغرفة. يمكن الرمز غلط أو الغرفة انتهت."); } else if(e && e.type==="network") setState("reconnecting","انقطع الاتصال… نرجّعه."); });
-      bindConn(pr.connect("khy-"+code, {reliable:true}));
-      setTimeout(()=>{ if(P.state==="joining") setState("error","الغرفة ما ردّت. تأكدوا من الرمز."); }, 15000);
-      startPing(); return true;
-    }catch(e){ setState("error","ما گدرنا نتصل. تأكدوا من الإنترنت."); return false; }
+    try{ await peerGuest(code); setTimeout(()=>{ if(P.state==="joining") setState("error","الغرفة ما ردّت. تأكدوا من الرمز."); }, 15000); startPing(); return true; }
+    catch(e){ setState("error","ما گدرنا نتصل. تأكدوا من الإنترنت."); return false; }
   };
   // بعد إعادة تحميل الصفحة: نرجع لنفس المقعد بالغرفة
-  P.resume = async () => { const s=session.get(); if(!s || !relayURL() || P.state!=="off") return false; P.isHost=!!s.host; P.code=s.code; wsToken=s.token; setState("joining"); return relayOpen({op:"join", code:s.code, token:s.token}); };
+  P.resume = async () => {
+    const s=session.get(); if(!s || P.state!=="off") return false;
+    P.isHost=!!s.host; P.code=s.code; P.ready={me:false,other:false}; _game=s.game||null;
+    if(s.t==="peer"){ setState("reconnecting","نرجع للغرفة…"); P.peerAway=P.isHost; try{ if(P.isHost) await peerHost(true); else { await peerGuest(s.code); } startPing(); return true; }catch(e){ session.set(null); setState("lost","ما گدرنا نرجع للغرفة. افتحوا غرفة جديدة."); return false; } }
+    if(!relayURL()) return false;
+    wsToken=s.token; setState("joining"); return relayOpen({op:"join", code:s.code, token:s.token});
+  };
   P.leave = (silent) => {
     if(P.state!=="off" && !silent) send({t:"bye"});
     clearTimeout(retryT); clearInterval(pingT);

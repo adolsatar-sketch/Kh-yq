@@ -12,6 +12,10 @@ updateJournalDot();
 const start = location.hash.slice(1);
 const validR = r => { const [k,id]=r.split(":"); if(!ROUTES[k]) return false; if(k==="game") return !!GAMES[id]; if(k==="play") return !!KG[id]; if(k==="tale") return !!TALEBOOK.find(t=>t.id===id); if(k==="room") return !!ROOMS[id] && nodeOpen(id); return true; };
 const roomQ = new URLSearchParams(location.search).get("room");
-go(roomQ ? "lobby" : (validR(start) ? start : "open"), false);
-Party.resume().then(ok=>{ if(ok && current!=="lobby") toast("رجعنا لغرفة اللعب ويه صديقك","friends"); });
+// نرجع للغرفة (إذا جانت مفتوحة بهذا التبويب) قبل رسم الصفحة، حتى اللعبة تعرف إنها لعبة مشتركة
+let savedRoom=null; try{ savedRoom=JSON.parse(sessionStorage.getItem("khy_room")||"null"); }catch(e){}
+const sameRoom = savedRoom && (!roomQ || savedRoom.code===roomQ.toUpperCase());
+const resumed = sameRoom ? Party.resume() : Promise.resolve(false);
+go(roomQ && !sameRoom ? "lobby" : (validR(start) ? start : (sameRoom ? "lobby" : "open")), false);
+resumed.then(ok=>{ if(ok && current!=="lobby") toast("رجعنا لغرفة اللعب ويه صديقك","friends"); });
 try{ history.replaceState({route:current},"",location.search+"#"+current); }catch(e){}

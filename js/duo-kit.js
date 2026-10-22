@@ -2,11 +2,12 @@
 const KG = {}; // registry of castle duo games
 function viewPlay(root, id){
   const def = KG[id]; if(!def){ go("world"); return; }
-  const net = Party.connected() && Party.game===id;
+  // بعد إعادة تحميل الصفحة الغرفة ترجع بنفس اللعبة حتى قبل ما يكمل الاتصال
+  const net = Party.game===id && ["connected","reconnecting","joining"].includes(Party.state);
   const isHost = !net || Party.isHost;
   const role = net ? (Party.me.char==="k"?"A":"B") : "both";
   const charOf = r => r==="A"?"k":"y";
-  let S = null, raf=0, last=0, lastSend=0, ended=false, paused=false, started=false;
+  let S = null, raf=0, last=0, lastSend=0, lastSnap=0, ended=false, paused=false, started=false;
   const v = h(`<section class="view play play-${id}"><div class="play-bg" style="${def.bg||""}"></div>${leafLayer(6,"soft")}
     <div class="play-wrap">
       <header class="play-head panel"><div class="ph-title">${def.icon?`<span class="ph-ic">${def.icon()}</span>`:""}<div><h2>${esc(def.title)}</h2><p>${esc(def.tag||"")}</p></div></div>
@@ -28,11 +29,12 @@ function viewPlay(root, id){
     sfx: k => (Sound[k]||Sound.soft)(),
     state: () => S
   };
-  function broadcast(force){ if(!net || !isHost) return; const now=performance.now(); if(!force && now-lastSend<90) return; lastSend=now; Party.send({t:"st", s:S}); }
+  function broadcast(force){ if(!net || !isHost) return; const now=performance.now(); if(!force && now-lastSend<90) return; lastSend=now; Party.send({t:"st", s:S}); if(force || now-lastSnap>1000){ lastSnap=now; try{ sessionStorage.setItem("khy_snap_"+id, JSON.stringify({S, ended})); }catch(e){} } }
   function apply(a, by){ const n = def.act(S, a, by, ctx); if(n) S=n; broadcast(true); render(); checkEnd(); }
   function render(){ if(S) def.render(S, ctx); $("[data-stat]",v).innerHTML = def.status? def.status(S, ctx) : ""; }
   function checkEnd(){ if(!S || ended) return; const r = def.result && def.result(S); if(r){ ended=true; finish(r); } }
   function finish(r){
+    try{ sessionStorage.removeItem("khy_snap_"+id); }catch(e){}
     cancelAnimationFrame(raf); broadcast(true);
     const first = !progress.wins["kg_"+id]; progress.wins["kg_"+id]=(progress.wins["kg_"+id]||0)+1; saveProgress();
     const n = 2 + (first?1:0) + ((r.rating||1)>=3?1:0);
@@ -77,6 +79,8 @@ function viewPlay(root, id){
       if(isHost && Party.state==="connected" && autoPaused){ paused=false; autoPaused=false; if(S){ S.paused=false; broadcast(true); } last=performance.now(); }
       if(Party.state==="off"||Party.state==="lost"){ banner.hidden=false; $("span",banner).textContent="انقطع الاتصال. ارجعوا لغرفة اللعب وافتحوا غرفة جديدة."; } }));
   }
+  // صاحب الغرفة رجع بعد إعادة تحميل: نكمل نفس الجولة من آخر لقطة محفوظة
+  if(net && isHost){ let snap=null; try{ snap=JSON.parse(sessionStorage.getItem("khy_snap_"+id)||"null"); }catch(e){} if(snap && snap.S && !snap.ended){ S=snap.S; started=true; ov.hidden=true; if(def.mount) def.mount(ctx); render(); last=performance.now(); if(def.tick||def.frame) raf=requestAnimationFrame(loop); setTimeout(()=>toast("رجعنا لنفس الجولة","check"),300); } }
   const kd = e => { if(def.key && S && !paused && !ended && !e.target.matches("input,textarea")) def.key(e, S, ctx); };
   window.addEventListener("keydown", kd);
   return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown",kd); offs.forEach(f=>f()); if(def.unmount) def.unmount(ctx); Party.snapshot=null; };

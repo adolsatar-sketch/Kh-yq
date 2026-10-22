@@ -42,4 +42,9 @@ log('A after B left tab:', await A.p.evaluate(()=>[Party.state, Party.peerAway, 
 await A.p.screenshot({path:out+'/mp_away_A.png'});
 await B.p.goBack(); await B.p.waitForTimeout(3500);
 log('B back:', await B.p.evaluate(()=>[Party.state, current]), 'A:', await A.p.evaluate(()=>[Party.state, Party.peerAway]));
+// صاحب الغرفة يعيد تحميل الصفحة بنص الجولة
+const beforeHost=await grid(); await A.p.reload(); await A.p.waitForTimeout(7000);
+log('after host reload A:', await A.p.evaluate(()=>[Party.state, current, Party.transport]), 'B:', await B.p.evaluate(()=>Party.state));
+const afterHost=await grid(); log('round kept after host reload:', beforeHost, '->', afterHost, beforeHost===afterHost?'SAME ROUND':'CHANGED');
+await B.p.keyboard.press('ArrowRight'); await A.p.waitForTimeout(800); const afterHost2=await grid(); log('moves after host reload:', afterHost!==afterHost2?'SYNC OK':'NO CHANGE');
 await b.close();
