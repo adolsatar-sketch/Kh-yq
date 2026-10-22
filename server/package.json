@@ -1,0 +1,16 @@
+{
+  "name": "khy-relay",
+  "version": "1.0.0",
+  "private": true,
+  "description": "خادم اللعب عن بعد لمغامرات خباب ويقين: غرف برموز قصيرة عبر WebSocket، ويخدم الموقع نفسه.",
+  "type": "module",
+  "main": "relay.mjs",
+  "scripts": {
+    "start": "node relay.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "ws": "8.18.0"
+  }
+}

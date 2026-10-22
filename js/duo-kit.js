@@ -69,6 +69,13 @@ function viewPlay(root, id){
     offs.push(Party.on("restart", ()=>{ if(!isHost){ ended=false; if(def.unmount) def.unmount(ctx); stage.innerHTML=""; S=null; $$(".scrim").forEach(x=>x.remove()); } }));
     offs.push(Party.on("snap", sn=>{ if(sn && sn.S && !isHost){ S=sn.S; ov.hidden=true; if(def.mount && !stage.childElementCount) def.mount(ctx); render(); } }));
     Party.snapshot = () => ({S});
+    // انقطاع صاحبك: نوقف الجولة مؤقتاً ونعرض حالة إعادة الاتصال، وترجع من نفس النقطة
+    const banner=h(`<div class="net-wait panel" hidden role="status"><b>${IC.friends} صاحبك انقطع…</b><span>ننتظره يرجع. الجولة محفوظة وتكمل من نفس النقطة.</span></div>`); v.appendChild(banner);
+    let autoPaused=false;
+    offs.push(Party.on("status", st=>{ const away = Party.state==="reconnecting"; banner.hidden=!away;
+      if(isHost && away && !paused && started){ paused=true; autoPaused=true; if(S){ S.paused=true; } }
+      if(isHost && Party.state==="connected" && autoPaused){ paused=false; autoPaused=false; if(S){ S.paused=false; broadcast(true); } last=performance.now(); }
+      if(Party.state==="off"||Party.state==="lost"){ banner.hidden=false; $("span",banner).textContent="انقطع الاتصال. ارجعوا لغرفة اللعب وافتحوا غرفة جديدة."; } }));
   }
   const kd = e => { if(def.key && S && !paused && !ended && !e.target.matches("input,textarea")) def.key(e, S, ctx); };
   window.addEventListener("keydown", kd);

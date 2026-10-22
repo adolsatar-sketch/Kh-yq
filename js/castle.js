@@ -29,6 +29,7 @@ function viewLobby(root){
     </div>
     <div class="panel lb-room" data-room hidden></div>
     <p class="lb-err" data-err role="alert"></p>
+    <details class="panel lb-help"><summary>شلون يشتغل اللعب عن بعد؟</summary><p>كل واحد يفتح الموقع من جهازه ومن مكانه. اللي يفتح الغرفة ياخذ رمز من 5 حروف ورابط؛ يدزه لصاحبه (رسالة، واتساب…). صاحبه يفتح الرابط أو يكتب الرمز. ما نطلب حساب ولا بيانات — اسم مستعار بس. إذا انقطع واحد، مقعده يبقى محجوز دقيقتين ويرجع لنفس الجولة. الغرفة تنتهي إذا ظلت فارغة.</p></details>
   </div></section>`);
   root.appendChild(v);
   const nick=$("#nick",v), err=$("[data-err]",v), room=$("[data-room]",v);
@@ -48,26 +49,26 @@ function viewLobby(root){
     if(st==="off"||st==="error"){ room.hidden=true; return; }
     room.hidden=false;
     const other=Party.other, mine=me.char, theirs=other?other.char:(mine==="k"?"y":"k");
-    const label={opening:"نفتح الغرفة…", waiting:"بانتظار صديقك يدخل", joining:"ندخل الغرفة…", connected:"متصلين", reconnecting:"نعيد الاتصال… خلّوا الصفحة مفتوحة", lost:"انقطع الاتصال"}[st]||st;
-    room.innerHTML=`<div class="lb-status" data-s="${st}"><i></i>${label}${Party.transport==="claude"?" · عبر Claude":""}</div>
+    const label={opening:"نفتح الغرفة…", waiting:"بانتظار صديقك يدخل", joining:"ندخل الغرفة…", connected:"متصلين", reconnecting:(Party.lastErr||"نعيد الاتصال…")+" خلّوا الصفحة مفتوحة", lost:Party.lastErr||"انقطع الاتصال"}[st]||st;
+    room.innerHTML=`<div class="lb-status" data-s="${st}"><i></i>${label}${{relay:" · عبر خادم اللعب",claude:" · عبر Claude",peer:" · اتصال مباشر"}[Party.transport]||""}</div>
       ${Party.code?`<div class="lb-code"><span>رمز الغرفة</span><b>${Party.code}</b><div class="row" style="margin:0;justify-content:center"><button class="btn small" data-copy>${IC.save} انسخي الرابط</button>${navigator.share?`<button class="btn ghost small" data-share>شاركي</button>`:""}</div></div>`:""}
       <div class="lb-pair"><div class="lb-p">${kidFigure(mine)}<b>${esc(me.name||"إنتِ")}</b><small>${Party.ready.me?"جاهزة":"مو جاهزة بعد"}</small></div>
         <div class="lb-vs">×</div>
         <div class="lb-p ${other?"":"ghost"}">${kidFigure(theirs)}<b>${other?esc(other.name):"…"}</b><small>${other?(Party.ready.other?"جاهز":"مو جاهز بعد"):"ما دخل بعد"}</small></div></div>
       <div class="row" style="justify-content:center"><button class="btn ${Party.ready.me?"ghost":"honey"}" data-ready ${st!=="connected"?"disabled":""}>${Party.ready.me?"إلغاء الجاهزية":"آني جاهزة"}</button><button class="btn ghost" data-leave>اطلعي من الغرفة</button></div>
-      ${st==="connected"?`<h3 class="lb-pick-h">${Party.isHost?"اختاري اللعبة":"صاحب الغرفة يختار اللعبة"}</h3><div class="lb-games">${Object.entries(KG).filter(([k,g])=>g.duo).map(([k,g])=>`<button class="lb-game" data-g="${k}" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${g.icon?g.icon():""}<b>${esc(g.title)}</b></button>`).join("")}<button class="lb-game" data-g="draw" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${ART.book("#2F5E57")}<b>رسم مشترك</b></button><button class="lb-game" data-g="show" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${ART.butterfly("#E9A79E","#E8C066")}<b>عرض الأزياء المشترك</b></button></div>${Party.isHost&&!(Party.ready.me&&Party.ready.other)?'<p class="d-note">لازم الاثنين يضغطون «جاهز» حتى تنفتح الألعاب.</p>':""}`:""}`;
+      ${st==="connected"?`<h3 class="lb-pick-h">${Party.isHost?"اختاري اللعبة":"صاحب الغرفة يختار اللعبة"}</h3><div class="lb-games">${Object.entries(KG).filter(([k,g])=>g.duo).map(([k,g])=>`<button class="lb-game" data-g="${k}" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${g.icon?g.icon():""}<b>${esc(g.title)}</b></button>`).join("")}<button class="lb-game" data-g="draw" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${ART.book("#2F5E57")}<b>رسم مشترك</b></button><button class="lb-game" data-g="show" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${ART.butterfly("#E9A79E","#E8C066")}<b>عرض الأزياء المشترك</b></button><button class="lb-game" data-g="tales" ${Party.isHost&&Party.ready.me&&Party.ready.other?"":"disabled"}>${ART.book("#7A2E2A")}<b>حكاية مشتركة</b></button></div>${Party.isHost&&!(Party.ready.me&&Party.ready.other)?'<p class="d-note">لازم الاثنين يضغطون «جاهز» حتى تنفتح الألعاب.</p>':""}`:""}`;
     const cp=$("[data-copy]",room); if(cp) cp.onclick=async()=>{ try{ await navigator.clipboard.writeText(Party.link()); toast("انتسخ الرابط","check"); }catch(e){ prompt("انسخي الرابط:", Party.link()); } };
     const sh=$("[data-share]",room); if(sh) sh.onclick=()=>navigator.share({title:"مغامرات خباب ويقين", text:"تعالي نلعب! رمز الغرفة: "+Party.code, url:Party.link()}).catch(()=>{});
     $("[data-ready]",room).onclick=()=>{ Party.setReady(!Party.ready.me); draw(); };
     $("[data-leave]",room).onclick=()=>{ Party.leave(); draw(); };
-    $$("[data-g]",room).forEach(b=>b.onclick=()=>{ const g=b.dataset.g; Party.game=g; Party.send({t:"start", game:g}); go(g==="draw"?"draw":g==="show"?"show":"play:"+g); });
+    $$("[data-g]",room).forEach(b=>b.onclick=()=>{ const g=b.dataset.g; if(g==="tales"){ toast("اختاروا كتاب، وصاحبك يدخل وياكم","bulb"); go("tales"); return; } Party.game=g; Party.send({t:"start", game:g}); go(g==="draw"?"draw":g==="show"?"show":"play:"+g); });
   }
   const offs=[Party.on("status",draw), Party.on("ready",draw), Party.on("hello",draw)];
   draw();
   return ()=>offs.forEach(f=>f());
 }
 // non-play start routes for guest
-Party.on("start", m=>{ if(!Party.isHost && (m.game==="draw"||m.game==="show")){ Party.game=m.game; go(m.game); } });
+
 
 Object.assign(ROUTES, {
   lobby:{view:r=>viewLobby(r), title:()=>"العب مع صديق", parent:"world"},

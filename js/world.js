@@ -364,7 +364,7 @@ const NODE_ACTS = {
   ],
   lanterns:()=>[playAct("lanterns")],
   bridge:()=>[{l:"اقروا اللوحة الصغيرة", s:"لوحة خشبية على حافة الجسر", ic:"eye", run:()=>modal(`<div class="letter">«من هنا يمشي القطار لغابة ${heroName()}. اللي يعبر الجسر بقلب طيب، الضباب يفتحله الطريق.»</div>`)}],
-  forest:()=>[{l:"ادخلوا غابة "+heroName(), s:"الغابة الأولى بكل ألعابها", art:()=>ART.treehouse(), hot:true, run:()=>go("map")},{l:"صندوق النكت العبيطة", art:()=>ART.jokeBox(), run:()=>go("jokes")}],
+  forest:()=>[{l:"ادخلوا غابة "+heroName(), s:"الغابة الأولى بكل ألعابها", art:()=>ART.treehouse(), hot:true, run:()=>sceneLeave($('[data-node="forest"]'), ()=>go(Store.get("forestIntro",false)?"map":"forestintro"))},{l:"صندوق النكت العبيطة", art:()=>ART.jokeBox(), run:()=>go("jokes")}],
   station:()=>[playAct("train"), {l:"رحلة على القناطر", s:"ركوب القطار والتفرّج", ic:"eye", run:trainRide}],
   garden:()=>[playAct("sling"), playAct("maze")],
   greenhouse:()=>[playAct("greenhouse")],
@@ -452,7 +452,7 @@ function toggleMiniMap(){
   $("[data-j]",m).onclick=()=>{ m.remove(); openJournal(); };
   setTimeout(()=>document.addEventListener("pointerdown", function off(e){ if(!m.contains(e.target) && !e.target.closest("#mapBtn")){ m.remove(); document.removeEventListener("pointerdown",off); } }),0);
 }
-const ROUTE_NODE = {map:"forest", game:"forest", jokes:"forest", cave:"forest", tales:"library", tale:"library", palace:"palace", show:"palace", book:"study", diary:"study", paint:"study", draw:"study", lobby:"plaza", meet:"plaza"};
+const ROUTE_NODE = {map:"forest", forestintro:"forest", game:"forest", jokes:"forest", cave:"forest", tales:"library", tale:"library", palace:"palace", show:"palace", book:"study", diary:"study", paint:"study", draw:"study", lobby:"plaza", meet:"plaza"};
 
 /* ---------- المقدمة: مشهد افتتاحي بلوحة القلعة كاملة ---------- */
 function viewOpening(root){

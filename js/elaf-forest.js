@@ -113,10 +113,11 @@ function viewMap(root){
       <button class="critter" data-critter="rabbit" style="left:55%;top:76%;width:46px" aria-label="أرنب">${ART.rabbit()}</button>
       <div class="hero-token" id="heroTok">${girlImg("idle")}</div>
       <button class="jm-token" id="jmTok" aria-label="${CONFIG.companionName}"><div class="jm-wrap">${ART.jaamous("idle")}</div></button>
+      <div class="hero-kids" id="kidsTok" aria-hidden="true">${kidFigure("k")}${kidFigure("y")}</div>
       ${ambientLayer(6)}
     </div></div>
     <div class="map-hint panel" id="mapHint">${esc(CONFIG.mapHint)}</div>
-    <div class="map-ui"><button class="btn ghost" id="allPlaces">${IC.list} كل الأماكن</button><button class="btn honey" id="mapSurprise">${IC.gift} فاجئيني</button></div>
+    <div class="map-ui"><button class="btn honey" id="toCastle">${IC.map} طريق قلعة الخريف</button><button class="btn ghost" id="allPlaces">${IC.list} كل الأماكن</button><button class="btn honey" id="mapSurprise">${IC.gift} فاجئيني</button></div>
   </section>`);
   root.appendChild(v);
   const scene=$(".mapscene",v), scroll=$(".mapscroll",v), path=$(".map-path path",v), tok=$("#heroTok",v), jt=$("#jmTok",v);
@@ -124,7 +125,8 @@ function viewMap(root){
   const total = path.getTotalLength(); const lens = {};
   PATH_ORDER.forEach(k=>{ const tx=PLACES[k].x, ty=PLACES[k].y*H/100; let best=0,bd=1e9; for(let i=0;i<=400;i++){ const p=path.getPointAtLength(total*i/400); const dd=(p.x-tx)**2+(p.y-ty)**2; if(dd<bd){bd=dd;best=total*i/400;} } lens[k]=best; });
   let at = Store.get("mapAt", "square"); if(!PLACES[at]) at="square";
-  const place = (x,y) => { tok.style.left=(x-4.2)+"%"; tok.style.top=(y+5)+"%"; jt.style.left=(x+4)+"%"; jt.style.top=(y+6)+"%"; };
+  const kt=$("#kidsTok",v);
+  const place = (x,y) => { tok.style.left=(x-4.2)+"%"; tok.style.top=(y+5)+"%"; jt.style.left=(x+4)+"%"; jt.style.top=(y+6)+"%"; kt.style.left=(x-11)+"%"; kt.style.top=(y+6)+"%"; };
   place(PLACES[at].x, PLACES[at].y);
   // center scroll on hero
   requestAnimationFrame(()=>{ scroll.scrollLeft = Math.max(0, scene.offsetWidth*PLACES[at].x/100 - scroll.clientWidth/2); });
@@ -170,6 +172,8 @@ function viewMap(root){
     window.addEventListener("pointermove", mv);
   }
   $("#allPlaces",v).onclick = placesSheet;
+  $("#toCastle",v).onclick = () => { Sound.chime(); if(motionOK()){ v.classList.add("leaving-map"); setTimeout(()=>go("world"), 420); } else go("world"); };
+  if(!Store.get("forestMet",false)){ Store.set("forestMet",true); setTimeout(()=>dialogue(v,[["elaf",0,`هلا خباب ويقين! هاي غابتي. العبوا براحتكم، وكل فوز يعطيكم نجوم صداقة.`],["k",1,"شگد حلوة! بيها نكت؟"],["jm",1,"صندوق النكت يم شجرة المشمش. وإذا فزتوا بلعبة، "+heroName()+" عندها هدية إلكم بالخريطة."]]), 600); }
   $("#mapSurprise",v).onclick = surprise;
   return () => { clearTimeout(hintT); mv && window.removeEventListener("pointermove", mv); };
 }

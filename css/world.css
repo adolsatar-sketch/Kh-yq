@@ -289,3 +289,12 @@
 .dotx{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--panel-edge)}
 .judge{display:flex;gap:20px;justify-content:center;margin:10px 0}.judge>div{display:grid;justify-items:center;gap:4px}
 @media (max-width:760px){ .pal-doll{width:min(70%,300px)} .pal-stage{min-height:360px} }
+.lb-help{margin-top:12px;padding:10px 14px}.lb-help summary{cursor:pointer;font-weight:700}.lb-help p{margin:6px 0 0;font-size:.92rem}
+.net-badge{cursor:pointer}
+.net-wait{position:fixed;z-index:40;top:70px;left:50%;transform:translateX(-50%);display:grid;gap:2px;text-align:center;padding:10px 16px;border-color:#9B3B2E;animation:pop .3s ease-out}
+.net-wait b{display:inline-flex;gap:6px;align-items:center;justify-content:center}.net-wait svg{width:20px}
+/* خباب ويقين يمشون ويا أيلاف بغابتها */
+.hero-kids{position:absolute;z-index:6;display:flex;transform:translate(-50%,-92%);pointer-events:none;transition:left .1s linear,top .1s linear}
+.hero-kids .kidfig{height:clamp(48px,7.5vh,86px)}
+.hero-kids .kidfig+.kidfig{margin-inline-start:-14%}
+.mapview.leaving-map .mapscene{transition:transform var(--m-out) ease-in,opacity var(--m-out);transform:scale(1.18);opacity:.2}

@@ -4,6 +4,7 @@ let cleanup = null, current = "open";
 const ROUTES = {
   meet:{view:(r)=>viewMeet(r), title:()=>"خباب ويقين", parent:"world"},
   map:{view:(r)=>viewMap(r), title:()=>"غابة "+heroName(), parent:"world"},
+  forestintro:{view:(r)=>{ Store.set("forestIntro", true); return viewIntro(r); }, title:()=>"غابة "+heroName(), bare:true},
   paint:{view:(r,id)=>viewPaint(r,id), title:()=>"المرسم", parent:"book"},
   diary:{view:(r)=>viewDiary(r), title:()=>"دفتر المذكرات", parent:"book"},
   cave:{view:(r)=>viewCave(r), title:()=>"الكهف المضيء", parent:"map"},
