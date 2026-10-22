@@ -12,7 +12,7 @@ KG.sling = {
   how:"حرّروا الطيور الورقية من أقفاصها. واحد يحدد الزاوية، والثاني يحدد القوة ويطلق، وبعد كل رمية تتبادلون الأدوار. القفص الذهبي يحتاج «إطلاق متزامن»: الاثنين يضغطون إطلاق بنفس الثانية.",
   roles:{A:"يبدي بالزاوية، وبعدين القوة", B:"يبدي بالقوة والإطلاق، وبعدين الزاوية"},
   keys:"الكيبورد: ↑↓ للزاوية، ←→ للقوة، المسافة للإطلاق.",
-  bg:"background:linear-gradient(180deg,#F6C98B,#F3E6C8 60%,#C98A4A)",
+  bg:"background:linear-gradient(180deg,#EAE3D2,#D9DFCF 60%,#A8B9A0)",
   init(seed){ return {lv:0, angle:45, power:.6, wind:0, aimBy:"A", phase:"aim", shots:0, crates:slBuild(0), proj:[], freed:0, total:2, dual:{A:0,B:0}, msg:"", seed}; },
   act(S,a,by){
     const aimer=S.aimBy, powerer=aimer==="A"?"B":"A";
@@ -38,7 +38,7 @@ KG.sling = {
   mount(ctx){
     ctx.stage.innerHTML=`<div class="sl"><canvas class="sl-cv" width="1000" height="560"></canvas>
       <div class="sl-ctl"><div class="sl-box" data-box="angle"><b>الزاوية <span data-av></span>°</b><input type="range" min="10" max="80" data-ang aria-label="الزاوية"><small data-who-a></small></div>
-      <div class="sl-box" data-box="power"><b>القوة <span data-pv></span>%</b><input type="range" min="20" max="100" data-pow aria-label="القوة"><small data-who-p></small><button class="btn honey" data-fire>أطلقي</button></div>
+      <div class="sl-box" data-box="power"><b>القوة <span data-pv></span>%</b><input type="range" min="20" max="100" data-pow aria-label="القوة"><small data-who-p></small><button class="btn honey" data-fire>أطلقوا</button></div>
       <div class="sl-box sl-dual" data-dualbox hidden><b>القفص الذهبي</b><small>الاثنين يضغطون خلال ثانية</small><div class="row" style="margin:0">${ctx.mine("A")?'<button class="btn" data-dual="A">إطلاق خباب</button>':""}${ctx.mine("B")?'<button class="btn" data-dual="B">إطلاق يقين</button>':""}</div></div>
       <button class="btn honey" data-next hidden>المرحلة الجاية</button></div><p class="sl-msg" data-msg></p></div>`;
     const st=ctx.stage;
@@ -104,7 +104,7 @@ KG.bridge = {
   title:"جسر الساعة", tag:"ميكانيكي ومُفسّرة رموز", duo:true, tint:"#8C6C48", icon:()=>ART.gear(),
   how:"جسر القلعة مقفول بثلاث أقفال. خباب يشوف الرافعات والترس والأجراس بس ما يعرف الحل، ويقين تشوف كتاب الرموز. لازم تحچون سوا: كل واحد يوصف اللي يشوفه.",
   roles:{A:"الميكانيكي: يحرّك الرافعات والترس ويدق الأجراس", B:"المُفسّرة: تقرا كتاب الرموز وتوجّه"},
-  bg:"background:linear-gradient(180deg,#3E3550,#5A4A60 50%,#8E6A50)",
+  bg:"background:linear-gradient(180deg,#203A35,#2F4F47 55%,#4D5A52)",
   init(seed){ const r=rng(seed); return {lv:0, stage:0, R:cbRound(r,0), lev:{sun:0,moon:0,star:0,leaf:0}, gear:1, rung:[], tries:0, jam:"", seed, open:false}; },
   act(S,a,by){
     const mech = by==="A";
@@ -135,7 +135,7 @@ KG.bridge = {
       <div class="cb-sec ${S.stage===0?"cur":S.stage>0?"done":""}"><b>١. الرافعات</b><div class="cb-levers">${Object.keys(S.lev).map(k=>`<button class="lever ${S.lev[k]?"up":""}" data-lev="${k}" ${!can||S.stage!==0?"disabled":""} aria-label="رافعة ${CB_SYM[k].n}: ${S.lev[k]?"فوگ":"جوّا"}">${cbIcon(k)}<span class="lv-stick"></span><small>${S.lev[k]?"فوگ":"جوّا"}</small></button>`).join("")}</div></div>
       <div class="cb-sec ${S.stage===1?"cur":S.stage>1?"done":""}"><b>٢. الترس</b><div class="cb-gear-row"><div class="cb-window">${Array.from({length:R.lanterns},()=>`<span>${ART.lantern()}</span>`).join("")}</div><button class="cb-gear" data-gear ${!can||S.stage!==1?"disabled":""} aria-label="الترس على ${S.gear}"><span style="transform:rotate(${S.gear*45}deg)">${ART.gear()}</span><b>${S.gear}</b></button></div><small>تشوف ${R.lanterns===1?"فانوس واحد":R.lanterns+" فوانيس"} بالشبّاك</small></div>
       <div class="cb-sec ${S.stage===2?"cur":""}"><b>٣. الأجراس</b><div class="cb-bells">${R.bellsSym.map(s=>`<button class="bellbtn" data-bell="${s}" ${!can||S.stage!==2?"disabled":""} aria-label="جرس ${CB_SYM[s].n}">${cbIcon(s)}</button>`).join("")}</div><div class="cb-rung">${S.rung.map(s=>cbIcon(s)).join("")||"<small>ما دگيتي بعد</small>"}</div><button class="btn ghost small" data-clr ${!can?"disabled":""}>امسحي الأجراس</button></div>
-      <div class="row">${S.stage<3?`<button class="btn honey" data-test ${!can?"disabled":""}>اسحبي الرافعة الكبيرة</button>`:""}${S.stage===3&&S.lv<2&&ctx.isHost?'<button class="btn honey" data-next>الجسر الجاي</button>':""}</div>`;
+      <div class="row">${S.stage<3?`<button class="btn honey" data-test ${!can?"disabled":""}>اسحبوا الرافعة الكبيرة</button>`:""}${S.stage===3&&S.lv<2&&ctx.isHost?'<button class="btn honey" data-next>الجسر الجاي</button>':""}</div>`;
     if(showCodex) codex.innerHTML=`<h3>كتاب الرموز</h3>
       <div class="cb-sec ${S.stage===0?"cur":""}"><b>١. الرافعات</b><ul class="cb-rules">${Object.keys(R.lev).map(k=>`<li>${cbIcon(k)} رافعة ${CB_SYM[k].n} لـ<b>${R.lev[k]?"فوگ":"جوّا"}</b></li>`).join("")}</ul></div>
       <div class="cb-sec ${S.stage===1?"cur":""}"><b>٢. الترس</b><p>رقم الترس = عدد الفوانيس اللي يشوفها الميكانيكي ${R.mult>1?"× "+R.mult+" ":""}+ ${R.add}${R.mult>1||R.lanterns*R.mult+R.add>8?" (إذا عدّى 8 يرجع يحسب من 1)":""}.</p></div>
@@ -161,13 +161,13 @@ KG.maze = {
   how:"لازم الاثنين يوصلون للبوابة الذهبية بالنص. خباب يشوف أزراره والبوابات اللي تسد طريقه، ويقين تشوف أزرارها وبواباتها. البوابة تنفتح بس لما الثاني واگف على زره. وكل واحد يشوف مفتاح واحد بس، والبوابة الذهبية تحتاج المفتاحين.",
   roles:{A:"خباب: يشوف الأزرار الخضر والمفتاح الأحمر", B:"يقين: تشوف الأزرار البنفسجية والمفتاح الأزرق"},
   keys:"على نفس الجهاز: خباب بـ W A S D، ويقين بالأسهم.",
-  bg:"background:linear-gradient(180deg,#7A5A3A,#4E3A28)",
+  bg:"background:linear-gradient(180deg,#2A4A43,#16302B)",
   init(){ return tmLevel(0, 0); },
   act(S,a,by){
     if(a.k==="move"){ const who=by; if(who!=="A"&&who!=="B") return S; const p=S.pos[who], L=TM_LEVELS[S.lv]; const n=[p[0]+a.d[0], p[1]+a.d[1]]; const c=L[n[0]]&&L[n[0]][n[1]]; if(!c||c==="#") { S.bump=who; return S; }
       const o=S.pos[who==="A"?"B":"A"], oc=L[o[0]][o[1]];
-      if(c==="A" && !(who==="B" && oc==="a")){ S.msg = who==="B"?"البوابة مسكّرة… "+"يمكن صاحبج لازم يوگف على زر؟":"هاي البوابة مو إلك"; return S; }
-      if(c==="B" && !(who==="A" && oc==="b")){ S.msg = who==="A"?"البوابة مسكّرة… اسأل صاحبك عن زر":"هاي البوابة مو إلج"; return S; }
+      if(c==="A" && !(who==="B" && oc==="a")){ S.msg = who==="B"?"البوابة مسكّرة… "+"يمكن صديقك لازم يوگف على زر؟":"هاي البوابة مو إلك"; return S; }
+      if(c==="B" && !(who==="A" && oc==="b")){ S.msg = who==="A"?"البوابة مسكّرة… اسأل صاحبك عن زر":"هاي البوابة مو إلك"; return S; }
       if(c==="G" && S.keys!==3){ S.msg="البوابة الذهبية تحتاج المفتاحين"; return S; }
       S.pos[who]=n; S.moves++; S.msg="";
       const kk=tmFind(L,"k"), yy=tmFind(L,"y"); if(n[0]===kk[0]&&n[1]===kk[1] && !(S.keys&1)){ S.keys|=1; S.msg="المفتاح الأحمر!"; } if(n[0]===yy[0]&&n[1]===yy[1] && !(S.keys&2)){ S.keys|=2; S.msg="المفتاح الأزرق!"; }
@@ -215,7 +215,7 @@ KG.lanterns = {
   how:"الفوانيس تنزل من السما والريح تسحبها. تحركوا يمين ويسار وامسكوها. خباب عنده «اندفاع» سريع، ويقين عندها «مغناطيس» يسحب الفوانيس القريبة. اجمعوا 30 فانوس بثلاث موجات.",
   roles:{A:"خباب: حركة + اندفاع", B:"يقين: حركة + مغناطيس"},
   keys:"على نفس الجهاز: خباب A/D والقدرة W، يقين ←/→ والقدرة ↑.",
-  bg:"background:linear-gradient(180deg,#2B2A4A,#5A4A6A 55%,#8E5A3A)",
+  bg:"background:linear-gradient(180deg,#16302B,#2A4A43 55%,#3B5C54)",
   init(seed){ return {t:0, p:{A:{x:300,dir:0,cd:0,dash:0}, B:{x:700,dir:0,cd:0,mag:0}}, L:[], caught:0, lost:0, wave:1, wind:0, gust:0, spawn:0, nid:1, seed, fx:[]}; },
   act(S,a,by){ const r=by; if(!S.p[r]) return S;
     if(a.k==="dir") S.p[r].dir=Math.max(-1,Math.min(1,a.v|0));
@@ -260,7 +260,7 @@ KG.library = {
   title:"ذاكرة مكتبة القلعة", tag:"بطاقات رموز بتلميحات موزعة", duo:true, tint:"#3E4A7A", icon:()=>ART.book("#3E4A7A"),
   how:"بطاقات مقلوبة على رفوف المكتبة. بالبداية خباب يلمح النص الفوگاني، ويقين تلمح النص الجوّاني لثانيتين. بعدين تتناوبون: كل دور تقلبون بطاقتين. تگدرون تلعبون تعاون (نقاط مشتركة) أو منافسة.",
   roles:{A:"خباب: يلمح الرفوف الفوگانية", B:"يقين: تلمح الرفوف الجوّانية"},
-  bg:"background:linear-gradient(180deg,#4A2E22,#2B1A12)",
+  bg:"background:linear-gradient(180deg,#2F4A44,#1A302A)",
   init(seed){ const r=rng(seed); const deck=[]; LIB_SYMS.forEach(s=>{deck.push(s,s);}); for(let i=deck.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; } return {deck, open:[], done:[], turn:"A", score:{A:0,B:0}, mode:"coop", peek:true, peekT:Date.now(), moves:0}; },
   act(S,a,by){
     if(a.k==="mode" && !S.moves){ S.mode=a.v; }
@@ -286,7 +286,7 @@ KG.orchestra = {
   how:"النوتات تنزل على مسارين: مسار الطبل لخباب ومسار الأجراس ليقين. اضغطوا لما توصل النوتة للخط الذهبي. كل طبقة تكمّل الثانية، والنتيجة مشتركة.",
   roles:{A:"خباب: الطبل (F أو زر الطبل)", B:"يقين: الأجراس (J أو زر الجرس)"},
   keys:"F للطبل، J للأجراس.",
-  bg:"background:linear-gradient(180deg,#2E2A3C,#4A3A5A)",
+  bg:"background:linear-gradient(180deg,#203A35,#2F4F47)",
   init(seed){ const r=rng(seed); const notes=[]; let t=2; for(let i=0;i<48;i++){ const lane = i%4===0?"A":(r()<.5?"A":"B"); notes.push({t:+t.toFixed(2), l:lane}); t+= [0.5,0.5,0.75,1][Math.floor(r()*4)]; } return {start:Date.now()+1500, notes, hits:{}, score:0, combo:0, best:0, end:t+2}; },
   act(S,a,by){ if(a.k==="hit"){ const n=S.notes[a.i]; if(!n || S.hits[a.i] || n.l!==by) return S; S.hits[a.i]=a.q; if(a.q==="p"){ S.score+=3; S.combo++; } else if(a.q==="g"){ S.score+=2; S.combo++; } else S.combo=0; S.best=Math.max(S.best,S.combo); } if(a.k==="fin") S.fin=true; return S; },
   mount(ctx){ ctx.stage.innerHTML=`<div class="orc"><canvas class="orc-cv" width="600" height="520"></canvas><div class="orc-pads">${ctx.mine("A")?'<button class="btn orc-btn" data-l="A">طبل</button>':""}${ctx.mine("B")?'<button class="btn orc-btn b" data-l="B">جرس</button>':""}</div></div>`;
@@ -318,7 +318,7 @@ KG.train = {
   how:"القطار يمشي على سكة بيها تفرعات. خباب يتحكم بالسرعة: يبطّأ بمناطق الأوراق ويوگف بالمحطات. يقين تبدّل التحويلة قبل كل تفرع حتى تجمعون التذاكر والفوانيس.",
   roles:{A:"خباب: السرعة والوقوف بالمحطات", B:"يقين: التحويلات (فوگ / جوّا)"},
   keys:"↑↓ للسرعة، المسافة للتحويلة.",
-  bg:"background:linear-gradient(180deg,#F2B07A,#F3E6C8 60%,#8E6A50)",
+  bg:"background:linear-gradient(180deg,#EDE6D2,#D9DFCF 60%,#A8B9A0)",
   init(seed){ const r=rng(seed); const segs=[]; let x=600; for(let i=0;i<14;i++){ const kind = i%4===3?"station":"fork"; const up = r()<.5; segs.push({x, kind, items: kind==="fork"?{up: up?(r()<.3?"lantern":"ticket"):"leaves", down: up?"leaves":(r()<.3?"lantern":"ticket")}:null, done:false}); x+=520+Math.floor(r()*160); } return {x:0, v:120, target:120, sw:"up", segs, tickets:0, lanterns:0, stations:0, slowHits:0, end:x+300, track:"main", msg:""}; },
   act(S,a,by){ if(a.k==="speed" && by==="A") S.target=Math.max(0,Math.min(320,a.v)); if(a.k==="switch" && by==="B") S.sw = S.sw==="up"?"down":"up"; return S; },
   tick(S,dt){ S.v += (S.target-S.v)*Math.min(1,dt*2); S.x += S.v*dt;
@@ -327,7 +327,7 @@ KG.train = {
       if(sg.kind==="station" && S.x>sg.x-40 && S.x<sg.x+60 && S.v<25){ sg.done=true; S.stations++; S.msg="وقفة مضبوطة بالمحطة!"; }
       if(sg.kind==="station" && S.x>sg.x+60 && !sg.done){ sg.done=true; S.msg="فاتتنا المحطة"; } });
     if(S.x>S.end) S.fin=true; return S; },
-  mount(ctx){ ctx.stage.innerHTML=`<div class="tr"><canvas class="tr-cv" width="1000" height="420"></canvas><div class="tr-ctl">${ctx.mine("A")?`<div class="sl-box"><b>السرعة</b><input type="range" min="0" max="320" value="120" data-sp aria-label="السرعة"><button class="btn ghost small" data-stop>وگوف</button></div>`:""}${ctx.mine("B")?`<div class="sl-box"><b>التحويلة</b><button class="btn honey" data-sw>بدّلي</button><small data-swl></small></div>`:""}</div><p class="sl-msg" data-msg></p></div>`;
+  mount(ctx){ ctx.stage.innerHTML=`<div class="tr"><canvas class="tr-cv" width="1000" height="420"></canvas><div class="tr-ctl">${ctx.mine("A")?`<div class="sl-box"><b>السرعة</b><input type="range" min="0" max="320" value="120" data-sp aria-label="السرعة"><button class="btn ghost small" data-stop>وگوف</button></div>`:""}${ctx.mine("B")?`<div class="sl-box"><b>التحويلة</b><button class="btn honey" data-sw>بدّلوا</button><small data-swl></small></div>`:""}</div><p class="sl-msg" data-msg></p></div>`;
     const sp=$("[data-sp]",ctx.stage); if(sp) sp.oninput=e=>ctx.act({k:"speed",v:+e.target.value,by:"A"});
     const stp=$("[data-stop]",ctx.stage); if(stp) stp.onclick=()=>{ ctx.act({k:"speed",v:0,by:"A"}); if(sp) sp.value=0; };
     const sw=$("[data-sw]",ctx.stage); if(sw) sw.onclick=()=>ctx.act({k:"switch",by:"B"});
@@ -354,7 +354,7 @@ KG.race = {
   title:"سباق عربات البلدة", tag:"سباق قصير بمسار خريفي", duo:true, tint:"#B33A26", icon:()=>ART.crate(),
   how:"كل واحد يسوق عربته بمساره: غيّر الحارة فوگ وجوّا، اتجنّب أكوام الأوراق، والتقط الأسهم الذهبية للتسريع. منافسة ودّية — أول واحد يوصل يفوز. على نفس الجهاز تسابقين يقين ضد خباب، أو خلّي الجهاز يسوق واحد.",
   roles:{A:"عربة خباب (W/S)", B:"عربة يقين (↑/↓)"},
-  bg:"background:linear-gradient(180deg,#F6C98B,#C98A4A)",
+  bg:"background:linear-gradient(180deg,#E9E1CC,#C9D3C0)",
   init(seed){ const r=rng(seed); const obs={A:[],B:[]}; ["A","B"].forEach(k=>{ let x=500; while(x<5200){ obs[k].push({x, lane:Math.floor(r()*3), t: r()<.3?"boost":"pile"}); x+=180+Math.floor(r()*140); } }); return {c:{A:{x:0,lane:1,v:220,boost:0,stun:0},B:{x:0,lane:1,v:220,boost:0,stun:0}}, obs, len:5400, go:Date.now()+2000, ai:true, winner:null}; },
   act(S,a,by){ const car=S.c[by]; if(!car) return S; if(a.k==="lane") car.lane=Math.max(0,Math.min(2,car.lane+a.d)); if(a.k==="ai") S.ai=!!a.v; return S; },
   tick(S,dt,ctx){ if(Date.now()<S.go || S.winner) return S;
@@ -388,7 +388,7 @@ KG.greenhouse = {
   title:"مهمة الدفيئة", tag:"ضوء وماء لكل نبتة", duo:true, tint:"#5B7F4A", icon:()=>ART.flower("#F3C1BA"),
   how:"كل نبتة تحتاج شي معيّن: ضوء بس، ماي بس، الاثنين، أو ولا شي (تحب الظل). خباب يفتح ستائر الضوء للصفوف، ويقين تفتح صنابير الماي للأعمدة. لگوا التركيبة اللي ترضي كل النباتات.",
   roles:{A:"خباب: ستائر الضوء (الصفوف)", B:"يقين: صنابير الماي (الأعمدة)"},
-  bg:"background:linear-gradient(180deg,#DDEBD0,#9DBF8E)",
+  bg:"background:linear-gradient(180deg,#E4ECE1,#A8B9A0)",
   init(seed){ return ghLevel(0, seed, 0); },
   act(S,a,by){ if(a.k==="row" && by==="A") S.rows[a.i]=S.rows[a.i]?0:1; if(a.k==="col" && by==="B") S.cols[a.i]=S.cols[a.i]?0:1; if(a.k==="toggle"||a.k==="row"||a.k==="col"){ S.moves++; S.solved = ghOK(S); } if(a.k==="next" && S.solved && S.lv<2) return ghLevel(S.lv+1, S.seed, S.moves); return S; },
   mount(ctx){ ctx.stage.innerHTML=`<div class="gh" data-gh></div>`; },

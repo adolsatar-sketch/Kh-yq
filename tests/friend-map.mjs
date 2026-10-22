@@ -6,6 +6,6 @@ const A=await mk('A'), B=await mk('B');
 await A.goto(U+'#lobby'); await A.reload(); await A.waitForTimeout(500); await A.click('[data-ch] button[data-c="k"]'); await A.click('[data-create]'); await A.waitForSelector('.lb-code b');
 await B.goto(await A.evaluate(()=>Party.link())); await B.waitForTimeout(500); await B.click('[data-join]'); await B.waitForTimeout(1200);
 await A.evaluate(()=>go('world')); await B.evaluate(()=>go('world')); await A.waitForTimeout(800);
-await B.evaluate(()=>{ document.querySelector('[data-node="garden"]').click(); }); await B.waitForTimeout(2500);
+await B.evaluate(()=>{ document.querySelector('[data-region="garden"]').click(); }); await B.waitForTimeout(2500);
 console.log('A sees friend at:', await A.evaluate(()=>[Party.friendAt, !!document.querySelector('.wm-friend'), document.querySelector('.wm-friend b')?.textContent]));
 await A.evaluate(()=>document.querySelectorAll('.scrim').forEach(s=>s.remove())); await A.screenshot({path:out+'/friendmap.png'}); await b.close();

@@ -1,5 +1,5 @@
 /* ============ Fashion palace: dolls, wardrobe, wings, runway ============ */
-const PALETTE = ["#2F5E57","#7A2E2A","#B5482A","#D9A53A","#E9A79E","#F3E6C8","#3E4A7A","#8EC3CF","#B9A6DD","#5B7F4A","#2B2B33","#FFFFFF","#C76B8E","#6B4A2E"];
+const PALETTE = ["#203A35","#C97964","#B88A5A","#A8B9A0","#2F5E57","#7A2E2A","#B5482A","#D9A53A","#E9A79E","#F3E6C8","#3E4A7A","#8EC3CF","#B9A6DD","#5B7F4A","#2B2B33","#FFFFFF","#C76B8E","#6B4A2E"];
 const WINGS = {
   feather:{name:"ريش", c:"#F3E6C8", svg:c=>wingSet(`<path d="M150 220C110 150 40 110 8 140C30 160 20 190 40 200C20 220 30 250 56 250C40 280 70 300 96 286C90 320 130 320 146 270Z" fill="${c}" stroke="#8C6C48" stroke-width="2.5"/><path d="M146 240C110 200 60 170 20 150M140 255C100 235 60 230 44 228M134 268C110 262 84 268 70 280" stroke="#8C6C48" stroke-width="1.6" fill="none"/>`)},
   butterfly:{name:"فراشة", c:"#B9A6DD", svg:c=>wingSet(`<path d="M150 230C120 130 30 90 12 140C0 180 60 220 140 240Z" fill="${c}" stroke="#4A3E5E" stroke-width="2.5"/><path d="M146 245C90 250 30 300 60 340C90 370 130 300 148 260Z" fill="#E8C066" stroke="#4A3E5E" stroke-width="2.5"/><circle cx="70" cy="150" r="14" fill="#FFF" opacity=".55"/><circle cx="84" cy="310" r="10" fill="#FFF" opacity=".5"/>`)},
@@ -16,7 +16,7 @@ const ACCS = {
   tophat:{name:"قبعة عالية", svg:()=>`<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg"><rect x="34" y="6" width="52" height="50" rx="4" fill="#2B2B33"/><rect x="34" y="40" width="52" height="8" fill="#7A2E2A"/><ellipse cx="60" cy="58" rx="54" ry="10" fill="#2B2B33"/></svg>`},
   beret:{name:"بيريه", svg:()=>`<svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="30" rx="54" ry="18" fill="#7A2E2A"/><circle cx="60" cy="12" r="4" fill="#7A2E2A"/></svg>`},
   conductor:{name:"قبعة سائق القطار", svg:()=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><path d="M22 40C24 12 96 12 98 40Z" fill="#2E3E5C" stroke="#1E2A40" stroke-width="3"/><rect x="20" y="36" width="80" height="9" rx="4" fill="#D9A53A" stroke="#8C6A2A" stroke-width="2"/><path d="M20 44q-10 8 0 12h40l-6-12z" fill="#1E2A40"/><circle cx="60" cy="26" r="6" fill="#D9A53A"/></svg>`},
-  mushroom:{name:"قبعة فطر وردية", svg:()=>ART.sumoHat()},
+  acorn:{name:"قبعة بلوط مثل قبعة شوكة", svg:()=>ART.acornCap()},
   feather:{name:"ريشة البومة", slot:"hair", svg:()=>ART.feather()},
   lantern:{name:"فانوس صغير", slot:"hand", svg:()=>ART.lantern(true)},
   glasses:{name:"نظارات", svg:()=>`<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="20" r="14" fill="rgba(200,230,240,.3)" stroke="#6B4A2E" stroke-width="4"/><circle cx="82" cy="20" r="14" fill="rgba(200,230,240,.3)" stroke="#6B4A2E" stroke-width="4"/><path d="M52 20h16" stroke="#6B4A2E" stroke-width="4"/></svg>`}
@@ -119,22 +119,21 @@ function dollSVG(who, L, opts={}){
   if(A==="tophat") acc=`<g transform="translate(92 6) scale(.98)">${ACCS.tophat.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="beret") acc=`<g transform="translate(94 40) scale(.94)">${ACCS.beret.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="conductor") acc=`<g transform="translate(90 18) scale(1)">${ACCS.conductor.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
-  if(A==="mushroom") acc=`<g transform="translate(96 8) scale(1.8)">${ART.sumoHat().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(A==="acorn") acc=`<g transform="translate(104 18) scale(1.6)">${ART.acornCap().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="feather") acc=`<g transform="translate(196 34) rotate(24) scale(1.2)">${ART.feather().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="lantern") acc=`<g transform="translate(200 300) scale(1.1)">${ART.lantern(true).replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="glasses") acc=`<g transform="translate(90 110)">${ACCS.glasses.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
-  if(who==="y" && A!=="mushroom" && A!=="conductor") acc=`<g transform="translate(194 52) rotate(18) scale(.9)">${ART.maple("#D98A2E").replace(/<\/?svg[^>]*>/g,"")}</g>`+acc;
+  if(who==="y" && A!=="acorn" && A!=="conductor") acc=`<g transform="translate(194 52) rotate(18) scale(.9)">${ART.maple("#D98A2E").replace(/<\/?svg[^>]*>/g,"")}</g>`+acc;
   const scarf = who==="k" && !isDress ? `<path d="M126 190Q150 204 174 190L170 206Q150 214 130 206Z" fill="#B5482A"/><path d="M160 204L166 250L156 248Z" fill="#B5482A"/>` : "";
   return `<svg class="doll" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CH[who].name}">${W}${back}${body}${shoe}${cloth}${top}${scarf}${head}${hair}${acc}</svg>`;
 }
-function lookStore(){ return Object.assign({k:JSON.parse(JSON.stringify(DEFAULT_LOOK.k)), y:JSON.parse(JSON.stringify(DEFAULT_LOOK.y))}, Store.get("looks",{})); }
+function lookStore(){ const L=Object.assign({k:JSON.parse(JSON.stringify(DEFAULT_LOOK.k)), y:JSON.parse(JSON.stringify(DEFAULT_LOOK.y))}, Store.get("looks",{})); ["k","y"].forEach(w=>{ if(L[w].acc && L[w].acc.id==="mushroom") L[w].acc.id="acorn"; }); return L; }
 function viewPalace(root, opts={}){
   const looks = lookStore(); let who = opts.who || "y", cat = "dress", shared = opts.shared;
   const v=h(`<section class="view palace"><div class="pal-bg"></div><div class="chandelier" aria-hidden="true"></div>${leafLayer(6,"soft")}
     <div class="pal-wrap">
       <div class="pal-stage panel"><div class="pal-doll" data-doll></div>
-        <div class="pal-elaf"><img class="girl idle" src="${GIRL}" alt="${esc(heroName())} الستايلست" draggable="false"><span class="say" data-tip>${esc(heroName())}: أنا الستايلست اليوم! اختاروا تحدي وصمموا.</span></div>
-        ${opts.shared?"":`<button class="pal-sumo" data-sumo aria-label="${CONFIG.guestName}">${ART.sumo(flag("hatReturned")?"happy":"idle").replace('<ellipse cx="100" cy="210"', flag("hatReturned")?'<g transform="translate(46 0) scale(1.8)">'+ART.sumoHat().replace(/<\/?svg[^>]*>/g,"")+'</g><ellipse cx="100" cy="210"':'<ellipse cx="100" cy="210"')}</button>`}
+        <div class="pal-stylist" data-stylist>${npcHTML("rayhana","idle")}<span class="say" data-tip>ريحانة: أهلاً بورشتي! اختاروا تحدي وصمموا.</span></div>
         <div class="seg pal-who"><button data-who="k">${faceHTML("k",0,28)} خباب</button><button data-who="y">${faceHTML("y",0,28)} يقين</button></div></div>
       <div class="pal-tools panel">
         <div class="pal-cats" role="tablist">${CATS.map(c=>`<button data-cat="${c.k}" role="tab">${c.name}</button>`).join("")}</div>
@@ -143,7 +142,7 @@ function viewPalace(root, opts={}){
         <div class="pal-chal" data-chal></div>
         <div class="pal-sliders"><label>الطول <input type="range" min="0" max="2" step="1" data-len></label><label>المقاس <input type="range" min="0" max="2" step="1" data-fit></label></div>
         <div class="row" style="margin-top:8px">${shared?"":`<button class="btn honey" data-show>${IC.star} مسرح العرض</button>`}<button class="btn ghost small" data-reset>${IC.restart} الشكل الأصلي</button></div>
-        <p class="d-note">القطع المقفولة تنفتح بنجوم الألعاب. عندج الآن ${progress.stars} نجمة.</p>
+        <p class="d-note">القطع المقفولة تنفتح بنجوم الألعاب. عندكم الآن ${progress.stars} نجمة.</p>
       </div>
     </div></section>`);
   root.appendChild(v);
@@ -163,11 +162,11 @@ function viewPalace(root, opts={}){
   const kidDance=()=>{ const d=$("[data-doll]",v); kidAct(d,"happy"); drawChal(); tip(); };
   let chal = Store.get("styleChal", STYLE_CHALLENGES[0].id), tipT;
   const tipEl=$("[data-tip]",v);
-  function tip(force){ const C=STYLE_CHALLENGES.find(c=>c.id===chal); const miss=C.rules.filter(r=>!r[1](L())); if(!force && Math.random()<.5) return; tipEl.textContent = heroName()+": "+(miss.length ? pick(["حلو! ","يجنن! ","ممم… ","خوش اختيار! "])+"بس لتحدي «"+C.n+"» جرّبوا: "+miss[0][0]+"." : pick(["هاي الإطلالة كاملة! ","واو، جاهزين للمسرح! "])+"قيّموها وشوفوا."); kidAct($(".pal-elaf",v),"talk"); }
+  function tip(force){ const C=STYLE_CHALLENGES.find(c=>c.id===chal); const miss=C.rules.filter(r=>!r[1](L())); if(!force && Math.random()<.5) return; tipEl.textContent = "ريحانة: "+(miss.length ? pick(["حلو! ","يجنن! ","ممم… ","خوش اختيار! "])+"بس لتحدي «"+C.n+"» جرّبوا: "+miss[0][0]+"." : pick(["هاي الإطلالة كاملة! ","واو، جاهزين للمسرح! "])+"قيّموها وشوفوا."); kidAct($(".pal-stylist .npc-fig",v),"talk"); }
   function drawChal(){ const C=STYLE_CHALLENGES.find(c=>c.id===chal); const box=$("[data-chal]",v);
-    box.innerHTML=`<b>تحدي ${esc(heroName())}:</b><div class="pal-cats">${STYLE_CHALLENGES.map(c=>`<button data-ch="${c.id}" aria-selected="${c.id===chal}">${esc(c.n)}${progress["once_style_"+c.id]?" ✔":""}</button>`).join("")}</div><ul class="q-sub">${C.rules.map(r=>{ const ok=r[1](L()); return `<li class="${ok?"done":""}">${ok?IC.check:"<i class='dotx'></i>"}${esc(r[0])}</li>`; }).join("")}</ul><button class="btn small" data-rate>${IC.star} خلّي ${esc(heroName())} تقيّم</button>`;
+    box.innerHTML=`<b>تحدي ريحانة:</b><div class="pal-cats">${STYLE_CHALLENGES.map(c=>`<button data-ch="${c.id}" aria-selected="${c.id===chal}">${esc(c.n)}${progress["once_style_"+c.id]?" ✔":""}</button>`).join("")}</div><ul class="q-sub">${C.rules.map(r=>{ const ok=r[1](L()); return `<li class="${ok?"done":""}">${ok?IC.check:"<i class='dotx'></i>"}${esc(r[0])}</li>`; }).join("")}</ul><button class="btn small" data-rate>${IC.star} خلّوا ريحانة تقيّم</button>`;
     $$("[data-ch]",box).forEach(b=>b.onclick=()=>{ chal=b.dataset.ch; Store.set("styleChal",chal); drawChal(); tip(true); });
-    $("[data-rate]",box).onclick=()=>{ const n=styleScore(C, L()); Sound.chime(); tipEl.textContent=heroName()+": "+["نبدي من جديد؟ اختاروا قطعة وحدة من القائمة.","بداية حلوة! بعد شوية.","قريبة كلش! ناقص شي واحد.","تحفة! ثلاث نجوم من الستايلست."][n]; kidAct($(".pal-elaf",v),"happy"); if(n===3){ confetti(); addStarsOnce("style_"+C.id, 2, "تحدي «"+C.n+"»"); drawChal(); } };
+    $("[data-rate]",box).onclick=()=>{ const n=styleScore(C, L()); Sound.chime(); tipEl.textContent="ريحانة: "+["نبدي من جديد؟ اختاروا قطعة وحدة من القائمة.","بداية حلوة! بعد شوية.","قريبة كلش! ناقص شي واحد.","تحفة! ثلاث نجوم من الخيّاطة."][n]; kidAct($(".pal-stylist .npc-fig",v),"happy"); if(n===3){ confetti(); addStarsOnce("style_"+C.id, 2, "تحدي «"+C.n+"»"); drawChal(); } };
   }
   $$("[data-cat]",v).forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; drawItems(); });
   const setWho=w=>{ who=w; $$("[data-who]",v).forEach(b=>b.setAttribute("aria-pressed",b.dataset.who===w)); drawDoll(); drawItems(); };
@@ -178,10 +177,10 @@ function viewPalace(root, opts={}){
   const sb=$("[data-show]",v); if(sb) sb.onclick=()=>go("show");
   $("[data-reset]",v).onclick=()=>{ looks[who]=JSON.parse(JSON.stringify(DEFAULT_LOOK[who])); save(); setWho(who); };
   setWho(who); drawChal();
-  const sumoB=$("[data-sumo]",v); if(sumoB) sumoB.onclick=()=>{ react(sumoB,"hop"); setFlag("metSumo"); dialogue(v, hasItem("sumoHat") && !flag("hatReturned") ? [["sumo",1,"قبعتي!! خلّوني أشوفها… روحوا للخريطة وسلّموها بقصر الأزياء."]] : [["sumo",flag("hatReturned")?1:0,npcLine("sumo")]]); };
+  const sty=$("[data-stylist] .npc-fig",v); if(sty && !shared) sty.onclick=()=>{ react(sty,"hop"); setFlag("metRayhana"); dialogue(v, [["rayhana",1,npcLine("rayhana")]]); };
   return {setWho, looks, redraw:()=>{ drawDoll(); drawItems(); }};
 }
-/* تحديات ستايلست: أيلاف تختار موضوع وتقيّم الإطلالة (بدون عقاب، بس تلميحات) */
+/* تحديات ريحانة الخيّاطة: تختار موضوع وتقيّم الإطلالة (بدون عقاب، بس تلميحات) */
 const WARM=["#7A2E2A","#B5482A","#D9A53A","#6B4A2E","#C8552B"], NIGHT=["#3E4A7A","#2B2B33","#B9A6DD"], SOFT=["#E9A79E","#5B7F4A","#FFFFFF","#F3E6C8","#C76B8E","#8EC3CF"];
 const lookColors = L => (L.mode==="dress" ? [L.dress.c] : [L.top.c, L.bottom.c]).concat(L.jacket && L.jacket.id!=="none" ? [L.jacket.c] : []);
 const accId = L => (L.acc&&L.acc.id)||"none", wingId = L => (L.wings&&L.wings.id)||"none";
@@ -206,8 +205,8 @@ function viewShow(root){
   const myWho = net ? Party.me.char : null;
   let theme = Store.get("showTheme", THEMES[0]), walk="calm";
   const v=h(`<section class="view showroom"><div class="sr-wrap">
-    <div class="panel sr-head"><div><h2>عرض الأزياء ${net?"المشترك":""}</h2><p>${net?`إنتِ تصممين ${CH[myWho].name}، وصاحبج يصمم الثاني. لما تجهزون، العرض يبدي بنفس الوقت عند الاثنين.`:"صممي الشخصيتين، اختاري الموضوع وطريقة المشي، وشغّلي العرض."}</p></div>
-      <div class="sr-ctl"><label>الموضوع <select data-theme>${THEMES.map(t=>`<option ${t===theme?"selected":""}>${t}</option>`).join("")}</select></label><label>المشي <select data-walk><option value="calm">هادئ</option><option value="hop">قفزات</option><option value="spin">دوران</option></select></label><button class="btn honey" data-play>${net?"آني جاهزة":"شغّلي العرض"}</button><span class="chip" data-st></span></div></div>
+    <div class="panel sr-head"><div><h2>عرض الأزياء ${net?"المشترك":""}</h2><p>${net?`إنت تصمم ملابس ${CH[myWho].name}، وصديقك يصمم الشخصية الثانية. لما تجهزون، العرض يبدي بنفس الوقت عند الاثنين.`:"صمموا الشخصيتين، اختاروا الموضوع وطريقة المشي، وشغّلوا العرض."}</p></div>
+      <div class="sr-ctl"><label>الموضوع <select data-theme>${THEMES.map(t=>`<option ${t===theme?"selected":""}>${t}</option>`).join("")}</select></label><label>المشي <select data-walk><option value="calm">هادئ</option><option value="hop">قفزات</option><option value="spin">دوران</option></select></label><button class="btn honey" data-play>${net?"جاهز":"شغّلوا العرض"}</button><span class="chip" data-st></span></div></div>
     <div data-design></div><div data-stage></div></div></section>`);
   root.appendChild(v);
   const pal = viewPalace($("[data-design]",v), {who: myWho||"y", shared: net ? {lock:true, onChange:(w,l)=>Party.send({t:"look", who:w, look:l})} : null});
@@ -217,10 +216,10 @@ function viewShow(root){
   function play(){ const looks=lookStore(); if(net && Party.otherLook) looks[Party.me.char==="k"?"y":"k"]=Party.otherLook; const st=$("[data-stage]",v); st.innerHTML=runwayHTML(looks, theme, walk); st.scrollIntoView({behavior:motionOK()?"smooth":"auto"}); stopMusic(); stopMusic=runwayMusic(); setTimeout(()=>{ stopMusic(); stopMusic=()=>{}; }, 14000); Sound.chime(); confetti(); addStarsOnce("runway1",2,"أول عرض أزياء"); if(typeof checkUnlocks==="function") checkUnlocks(); readyMe=readyOther=false;
     clearTimeout(judgeT); const C=STYLE_CHALLENGES.find(c=>c.n===theme);
     judgeT=setTimeout(()=>{ if(!document.body.contains(v)) return; const a=styleScore(C,looks.k), b=styleScore(C,looks.y), sum=a+b;
-      modal(`<h2>لجنة التحكيم: ${esc(heroName())} و${esc(CONFIG.guestName)}</h2><div class="judge"><div>${faceHTML("k",a>=2?1:0,56)}<b>خباب</b>${rateStars(C?a:3)}</div><div>${faceHTML("y",b>=2?1:0,56)}<b>يقين</b>${rateStars(C?b:3)}</div></div><p>${C?`موضوع «${esc(theme)}»: مجموعكم ${sum} من 6. `:"موضوع حر: كل الإطلالات تفوز! "}${esc(sum>=5||!C?pick(["المسرح كله صفّق!",CONFIG.guestName+" رقص من الفرح!"]):"عرض حلو! "+heroName()+" تگول: شوفوا تحدي الموضوع بالورشة حتى تكملون النجوم.")}</p>`);
+      modal(`<h2>لجنة التحكيم: ريحانة وزعفرانة</h2><div class="judge"><div>${faceHTML("k",a>=2?1:0,56)}<b>خباب</b>${rateStars(C?a:3)}</div><div>${faceHTML("y",b>=2?1:0,56)}<b>يقين</b>${rateStars(C?b:3)}</div></div><p>${C?`موضوع «${esc(theme)}»: مجموعكم ${sum} من 6. `:"موضوع حر: كل الإطلالات تفوز! "}${esc(sum>=5||!C?pick(["المسرح كله صفّق!","زعفرانة رقصت من الفرح!"]):"عرض حلو! ريحانة تگول: شوفوا تحدي الموضوع بورشتها حتى تكملون النجوم.")}</p>`);
       if(C && sum===6) addStarsOnce("duo_"+C.id, 3, "عرض مشترك كامل");
     }, motionOK()?12500:600); upd(); }
-  function upd(){ $("[data-st]",v).textContent = net ? (readyMe?(readyOther?"يلا!":"بانتظار صاحبج"):"") : ""; }
+  function upd(){ $("[data-st]",v).textContent = net ? (readyMe?(readyOther?"يلا!":"بانتظار صديقك"):"") : ""; }
   $("[data-theme]",v).onchange=e=>{ theme=e.target.value; Store.set("showTheme",theme); if(net) Party.send({t:"theme", theme}); };
   $("[data-walk]",v).onchange=e=>{ walk=e.target.value; if(net) Party.send({t:"walk", walk}); };
   $("[data-play]",v).onclick=()=>{ if(!net){ play(); return; } readyMe=true; Party.send({t:"showready", look:lookStore()[myWho]}); upd(); if(readyOther){ Party.send({t:"showgo", at:Date.now()}); play(); } };

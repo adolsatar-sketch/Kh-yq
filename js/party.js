@@ -21,7 +21,7 @@ const Party = (() => {
     if(!msg || typeof msg!=="object") return;
     if(msg.t==="hello"){
       P.other={name:String(msg.name||"صديق").slice(0,24), char:msg.char==="k"?"k":"y"}; P.peerAway=false;
-      if(!P.isHost && P.other.char===me.char){ me.char = me.char==="k"?"y":"k"; P.saveMe(); send(hello()); setTimeout(()=>toast("صاحبك اختار "+CH[P.other.char].name+"، فإنتِ صرتي "+CH[me.char].name,"check"),100); }
+      if(!P.isHost && P.other.char===me.char){ me.char = me.char==="k"?"y":"k"; P.saveMe(); send(hello()); setTimeout(()=>toast("صاحبك اختار "+CH[P.other.char].name+"، فصرت أنت "+CH[me.char].name,"check"),100); }
       if(P.isHost && P.other.char===me.char){ P.other.char = me.char==="k"?"y":"k"; }
       const was=P.state; setState("connected");
       // أي طرف يستلم «هلا» أول مرة يرد عليها، وصاحب الغرفة يرسل حالة اللعبة الحالية
