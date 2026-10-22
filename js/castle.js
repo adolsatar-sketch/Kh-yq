@@ -1,21 +1,55 @@
 /* ============ خباب ويقين: التعريف والتخصيص، وغرفة اللعب ويه صديق ============ */
+/* شاشة التعريف: مشهد هادئ من العالم — الشخصيتين بالنص، تعريف قصير، وزر متابعة.
+   الألوان والأجنحة بنافذة «تخصيص المظهر» منفصلة، وكل خيار يغيّر الشكل فعلاً. */
+const KID_INTRO = {
+  k:{trait:"مبادر ومرح", line:"أول واحد يركض للمغامرة، ويضحّك الكل حتى لو الطريق صعب.", says:["يلا نركض!","آني أسرع واحد بالقلعة","منو يسابقني؟","سمعتوا الساعة؟ تك تك!"], acts:["jump","run","happy","turn"]},
+  y:{trait:"فضولية وذكية", line:"تلاحظ التفاصيل الصغيرة، وتحل الألغاز قبل الكل.", says:["لحظة… لاحظتوا هاي الورقة؟","عندي فكرة!","خلّوني أشوف التلميح","كل باب إله مفتاح"], acts:["turn","happy","surprise","wait"]}
+};
 function viewMeet(root){
-  const v=h(`<section class="view meet"><div class="meet-wrap">
-    <figure class="sheet-frame"><img src="${SHEET}" alt="لوحة شخصيتي خباب ويقين"><figcaption>اللوحة الأصلية لخباب ويقين</figcaption></figure>
-    <div class="meet-side">
-      ${["k","y"].map(w=>`<div class="meet-card panel" data-who="${w}"><div class="mc-head">${faceHTML(w,1,70)}<div><h3 style="color:${CH[w].color}">${CH[w].name}</h3><p>${w==="k"?"مبادر ومرح، دايماً أول واحد يركض للمغامرة ويضحّك الكل.":"فضولية وذكية، تلاحظ التفاصيل وتحل الألغاز قبل الكل."}</p></div></div>
-        <div class="mc-stage">${kidFigure(w)}</div>
-        <div class="mc-acts">${[["walk","يمشي"],["run","يركض"],["jump","يقفز"],["turn","يلتفت"],["happy","يفرح"],["surprise","يتفاجأ"],["wait","ينتظر"],["talk","يحچي"]].map(([a,l])=>`<button class="chip" data-act="${a}">${w==="y"?l.replace(/^ي/,"ت"):l}</button>`).join("")}</div>
-        <div class="mc-custom"><label>أجنحة <select data-wing="${w}"><option value="">بدون</option>${Object.entries(WINGS).filter(([k])=>itemOpen(ITEMS.wings.find(i=>i.id===k))).map(([k,x])=>`<option value="${k}" ${KIDS_CUSTOM[w].wings===k?"selected":""}>${x.name}</option>`).join("")}</select></label><label>إكسسوار <select data-acc="${w}"><option value="">بدون</option>${Object.entries(ACCS).filter(([k])=>itemOpen(ITEMS.acc.find(i=>i.id===k))).map(([k,x])=>`<option value="${k}" ${KIDS_CUSTOM[w].acc===k?"selected":""}>${x.name}</option>`).join("")}</select></label><div class="mc-wcol" data-wc="${w}"><span>لون الأجنحة</span>${PALETTE.slice(0,10).map(col=>`<button class="swatch" data-col="${col}" style="background:${col}" aria-label="لون الأجنحة" aria-pressed="${(KIDS_CUSTOM[w].wcol||"")===col}"></button>`).join("")}</div></div>
-      </div>`).join("")}
-      <p class="d-note">التخصيص (أجنحة، لونها، وإكسسوار) يظهر بالخريطة والغرف والحكايات، واللوحة الأصلية تبقى مثل ما هي. الأجنحة والإكسسوارات الجديدة تنفتح بالنجوم والمهمات، والملابس الكاملة بقصر الأزياء.</p>
-    </div></div></section>`);
+  const v=h(`<section class="view meet2">
+    <div class="mt-stage">
+      <svg class="mt-bg" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="mtsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A4A43"/><stop offset="1" stop-color="#3B5C54"/></linearGradient></defs><rect width="1200" height="600" fill="url(#mtsky)"/>${P.castle(600,400,1.1,"#16302B")}<path d="M0 420Q300 360 600 410T1200 400V600H0Z" fill="#4D6A5F"/><path d="M0 480Q320 440 640 475T1200 470V600H0Z" fill="#A8B9A0"/><path d="M520 600Q580 520 600 480Q620 520 680 600Z" fill="#EAE3D2" opacity=".7"/>${P.lamp(170,420)}${P.lamp(1030,420)}</svg>
+      <div class="mt-kids">${["k","y"].map(w=>`<div class="mt-kid mt-${w}" data-who="${w}"><span class="bubble" data-b></span><button class="mt-fig" aria-label="حرّكوا ${CH[w].name}">${kidFigure(w)}</button></div>`).join("")}</div>
+    </div>
+    <div class="mt-info">
+      ${["k","y"].map(w=>`<div class="mt-card" data-card="${w}">${faceHTML(w,1,52)}<div><h3 style="color:${CH[w].color}">${CH[w].name} <small>${KID_INTRO[w].trait}</small></h3><p>${KID_INTRO[w].line}</p></div></div>`).join("")}
+      <p class="d-note mt-tip">اضغطوا على خباب أو يقين حتى يتحركون.</p>
+      <div class="mt-cta"><button class="btn honey" data-go>${IC.map} يلا للمغامرة</button><button class="btn ghost" data-custom>${IC.brush} تخصيص المظهر</button></div>
+    </div></section>`);
   root.appendChild(v);
-  $$(".meet-card",v).forEach(c=>{ const w=c.dataset.who; $$("[data-act]",c).forEach(b=>b.onclick=()=>{ const fig=$(".kidfig",c); kidAct(fig,b.dataset.act); if(b.dataset.act==="talk") { const s=$$(".say",c); s.forEach(x=>x.remove()); const bb=h(`<span class="say">${esc(pick(w==="k"?["يلا نركض!","آني أسرع واحد بالبلدة","منو يسابقني؟"]:["لحظة… لاحظتي هاي الورقة؟","عندي فكرة!","خلّي أشوف التلميح"]))}</span>`); $(".mc-stage",c).appendChild(bb); setTimeout(()=>bb.remove(),2500);} Sound.soft(); }); });
-  const upd=(w)=>{ Store.set("kidsCustom",KIDS_CUSTOM); const st=$(`.meet-card[data-who="${w}"] .mc-stage`,v); st.innerHTML=kidFigure(w); };
-  $$("[data-wing]",v).forEach(s=>s.onchange=()=>{ KIDS_CUSTOM[s.dataset.wing].wings=s.value; upd(s.dataset.wing); });
-  $$("[data-acc]",v).forEach(s=>s.onchange=()=>{ KIDS_CUSTOM[s.dataset.acc].acc=s.value; upd(s.dataset.acc); });
-  $$("[data-wc]",v).forEach(box=>{ const w=box.dataset.wc; $$("[data-col]",box).forEach(b=>b.onclick=()=>{ KIDS_CUSTOM[w].wcol=b.dataset.col; if(!KIDS_CUSTOM[w].wings){ const first=ITEMS.wings.find(i=>i.id!=="none"&&itemOpen(i)); if(first){ KIDS_CUSTOM[w].wings=first.id; const sel=$(`[data-wing="${w}"]`,v); if(sel) sel.value=first.id; } } $$("[data-col]",box).forEach(x=>x.setAttribute("aria-pressed",x===b)); upd(w); kidAct($(`.meet-card[data-who="${w}"] .kidfig`,v),"happy"); }); });
+  const timers=[]; const at=(ms,f)=>timers.push(setTimeout(f,ms));
+  const say=(w,t)=>{ const b=$(`.mt-${w} [data-b]`,v); b.textContent=t; b.classList.add("on"); clearTimeout(b._t); b._t=setTimeout(()=>b.classList.remove("on"),2200); };
+  const turn={k:0,y:0};
+  $$(".mt-fig",v).forEach(btn=>btn.onclick=()=>{ const w=btn.closest("[data-who]").dataset.who, I=KID_INTRO[w], i=turn[w]++%I.acts.length; kidAct($(".kidfig",btn), I.acts[i]); say(w, I.says[i]); Sound.soft(); });
+  // دخول هادئ: كل واحد يمشي لمكانه، بعدين يعرّف بنفسه
+  if(motionOK()){ v.classList.add("enter"); at(60,()=>v.classList.add("in")); at(900,()=>{ kidAct($(".mt-k .kidfig",v),"happy"); say("k","آني خباب!"); }); at(1900,()=>{ kidAct($(".mt-y .kidfig",v),"turn"); say("y","وآني يقين. أهلاً بكم!"); }); }
+  $("[data-go]",v).onclick=()=>sceneLeave(null,()=>go("world"));
+  $("[data-custom]",v).onclick=()=>customizeBox(()=>{ $$(".mt-fig",v).forEach(b=>{ const w=b.closest("[data-who]").dataset.who; b.innerHTML=kidFigure(w); }); });
+  return ()=>timers.forEach(clearTimeout);
+}
+/* تخصيص المظهر: خيارات صغيرة معنونة، تنحفظ وتظهر بالخريطة والغرف والحكايات */
+const WING_COLORS = [["#F5F0E3","عاجي"],["#A8B9A0","ميرمية"],["#B88A5A","نحاسي"],["#C97964","مرجاني"],["#203A35","صنوبري"],["#A9C6C8","سماوي"],["#D7B58C","ذهبي هادئ"],["#C9C3DA","بنفسجي فاتح"]];
+function customizeBox(onChange){
+  let who="y";
+  const md=modal(`<h2>تخصيص المظهر</h2><div class="seg cz-who"><button data-w="k">${faceHTML("k",0,28)} خباب</button><button data-w="y">${faceHTML("y",0,28)} يقين</button></div><div class="cz" data-body></div>`, {wide:true, cls:"cz-modal"});
+  const body=$("[data-body]",md.el);
+  const draw=()=>{
+    const c=KIDS_CUSTOM[who];
+    const wings=ITEMS.wings.filter(i=>i.id!=="none"), accs=ITEMS.acc.filter(i=>i.id!=="none");
+    const openW=wings.filter(itemOpen), openA=accs.filter(itemOpen), locked=wings.length+accs.length-openW.length-openA.length;
+    $$("[data-w]",md.el).forEach(b=>b.setAttribute("aria-pressed",b.dataset.w===who));
+    body.innerHTML=`<div class="cz-prev">${kidFigure(who)}</div><div class="cz-opts">
+      <fieldset><legend>الأجنحة</legend><div class="cz-chips"><button data-wing="" aria-pressed="${!c.wings}">بدون</button>${openW.map(i=>`<button data-wing="${i.id}" aria-pressed="${c.wings===i.id}">${esc(i.n)}</button>`).join("")}</div></fieldset>
+      ${c.wings?`<fieldset><legend>لون الأجنحة</legend><div class="cz-colors">${WING_COLORS.map(([col,n])=>`<button data-col="${col}" aria-pressed="${(c.wcol||"")===col}" aria-label="${n}"><i style="background:${col}"></i><small>${n}</small></button>`).join("")}</div></fieldset>`:""}
+      <fieldset><legend>إكسسوار</legend><div class="cz-chips"><button data-acc="" aria-pressed="${!c.acc}">بدون</button>${openA.map(i=>`<button data-acc="${i.id}" aria-pressed="${c.acc===i.id}">${esc(i.n)}</button>`).join("")}</div></fieldset>
+      ${locked?`<p class="d-note">${locked} خيارات بعدها مقفولة — تنفتح بنجوم الألعاب ومهمات العالم. الملابس الكاملة بقصر الأزياء.</p>`:""}</div>`;
+    const save=()=>{ Store.set("kidsCustom",KIDS_CUSTOM); draw(); onChange&&onChange(); kidAct($(".cz-prev .kidfig",body),"happy"); Sound.pop(); };
+    $$("[data-wing]",body).forEach(b=>b.onclick=()=>{ c.wings=b.dataset.wing; save(); });
+    $$("[data-col]",body).forEach(b=>b.onclick=()=>{ c.wcol=b.dataset.col; save(); });
+    $$("[data-acc]",body).forEach(b=>b.onclick=()=>{ c.acc=b.dataset.acc; save(); });
+  };
+  $$("[data-w]",md.el).forEach(b=>b.onclick=()=>{ who=b.dataset.w; draw(); });
+  draw();
 }
 
 function viewLobby(root){

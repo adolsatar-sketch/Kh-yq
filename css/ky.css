@@ -305,3 +305,47 @@ canvas.sl-cv,canvas.ln-cv,canvas.tr-cv,canvas.rc-cv,canvas.orc-cv{border:1px sol
 .cine-static.end .cine-siraj{animation:none}
 @media (max-height:560px){ .ct-sub,.ct-pre{display:none} .cine.s4 .ck{height:30vh} .cine-title{padding:8px 12px} }
 @media (max-width:520px){ .ct-cta .btn{flex:1 1 100%;justify-content:center} .cine.s4 .ck{height:22vh} }
+
+/* ---------- وجوه الشخصيات (من القصاصة النظيفة) ---------- */
+.cameo{background:var(--ivory-3);border:2px solid var(--copper-line);box-shadow:0 1px 4px rgba(22,48,43,.18)}
+.cameo span{transform-origin:50% 70%}
+
+/* ---------- شاشة التعريف ---------- */
+.meet2{display:flex;flex-direction:column;overflow:hidden;background:var(--pine-3)}
+.mt-stage{position:relative;flex:1 1 auto;min-height:46vh;overflow:hidden}
+.mt-bg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mt-kids{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);display:flex;align-items:flex-end;gap:clamp(18px,8vw,90px)}
+.mt-kid{position:relative;height:clamp(170px,40vh,380px);transition:transform 1s cubic-bezier(.2,.8,.3,1),opacity .5s}
+.mt-fig{height:100%;border:0;background:none;padding:0;display:block;cursor:pointer}
+.mt-fig .kidfig{height:100%}
+.mt-fig:focus-visible{outline:2px solid var(--coral);outline-offset:4px;border-radius:12px}
+.meet2.enter .mt-k{transform:translateX(40vw);opacity:0}.meet2.enter .mt-y{transform:translateX(-40vw);opacity:0;transition-delay:.25s}
+.meet2.enter.in .mt-kid{transform:none;opacity:1}
+.mt-kid .bubble{bottom:98%;left:50%;transform:translate(-50%,6px);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;background:var(--ivory-3);color:var(--ink);border:1px solid var(--copper-line);width:max-content;max-width:min(220px,44vw);text-align:center;font-size:.9rem}
+.mt-kid .bubble.on{opacity:1;transform:translate(-50%,0)}
+.mt-info{flex:none;background:var(--ivory);color:var(--ink);border-top:1px solid var(--copper-line);padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;max-width:900px;width:100%;margin:0 auto;border-radius:18px 18px 0 0}
+.mt-card{display:flex;gap:10px;align-items:flex-start}
+.mt-card h3{margin:0;font-family:var(--font-v);font-size:1.3rem}.mt-card h3 small{font-family:inherit;font-size:.78rem;color:var(--ink-soft);font-weight:700;margin-inline-start:4px}
+.mt-card p{margin:2px 0 0;font-size:.9rem;line-height:1.55;color:var(--ink-soft)}
+.mt-tip{grid-column:1/-1;margin:0;text-align:center}
+.mt-cta{grid-column:1/-1;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+@media (max-width:620px){ .mt-info{grid-template-columns:1fr} .mt-cta .btn{flex:1 1 auto;justify-content:center} .mt-kid{height:clamp(150px,34vh,300px)} }
+@media (max-height:560px){ .mt-card p{display:none} .mt-kid{height:44vh} }
+
+/* ---------- تخصيص المظهر ---------- */
+.cz-who{margin:4px 0 10px}
+.cz{display:grid;grid-template-columns:minmax(120px,200px) 1fr;gap:14px;align-items:start}
+.cz-prev{height:clamp(180px,34vh,300px);display:flex;justify-content:center;background:radial-gradient(circle at 50% 70%,var(--ivory-3),var(--ivory-2));border:1px solid var(--copper-line);border-radius:16px;padding:10px 0}
+.cz-prev .kidfig{height:100%}
+.cz-opts{display:grid;gap:8px}
+.cz fieldset{border:1px solid var(--copper-line);border-radius:12px;margin:0;padding:6px 10px 10px}
+.cz legend{font-weight:800;font-size:.9rem;color:var(--pine);padding:0 4px}
+.cz-chips{display:flex;flex-wrap:wrap;gap:6px}
+.cz-chips button{border:1px solid var(--copper-line);background:var(--ivory-3);color:var(--ink);border-radius:999px;padding:4px 12px;min-height:36px;font:inherit;font-size:.86rem;font-weight:700}
+.cz-chips button[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);box-shadow:inset 0 -2px 0 var(--coral)}
+.cz-colors{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.cz-colors button{display:grid;justify-items:center;gap:2px;border:1px solid transparent;background:none;border-radius:10px;padding:4px 2px;font:inherit;color:var(--ink)}
+.cz-colors i{width:28px;height:28px;border-radius:50%;border:1px solid rgba(38,52,47,.35)}
+.cz-colors small{font-size:.7rem}
+.cz-colors button[aria-pressed="true"]{border-color:var(--coral);background:var(--coral-soft)}
+@media (max-width:560px){ .cz{grid-template-columns:1fr} .cz-prev{height:26vh} }
