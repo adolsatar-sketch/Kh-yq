@@ -52,7 +52,8 @@ function viewRoom(root, id){
     const fit=()=>{ const W=stage.clientWidth, H=stage.clientHeight; let iw=Math.max(W, H*CASTLE_W/CASTLE_H)*z, ih=iw*CASTLE_H/CASTLE_W; let l=W/2-cx*iw, t=H/2-cy*ih; l=Math.min(0,Math.max(W-iw,l)); t=Math.min(0,Math.max(H-ih,t)); img.style.width=iw+"px"; img.style.height=ih+"px"; img.style.left=l+"px"; img.style.top=t+"px"; };
     ro=new ResizeObserver(fit); ro.observe(stage); fit();
   }
-  requestAnimationFrame(()=>{ scroll.scrollLeft=Math.max(0,(stage.scrollWidth-scroll.clientWidth)*(R.focusX??.5)); });
+  // على الشاشات الضيقة المشهد ينسحب يمين ويسار مثل خريطة أيلاف؛ نبدي من مكان خباب ويقين
+  requestAnimationFrame(()=>{ const extra=stage.scrollWidth-scroll.clientWidth; if(extra<=0) return; scroll.scrollLeft = R.focusX!=null ? extra*R.focusX : Math.max(0, stage.scrollWidth*(R.kidsX||14)/100 - scroll.clientWidth*.25); });
   const ctx = {
     id, v, task, stage,
     say:(lines, done)=>dialogue(v, lines, done),
@@ -299,7 +300,39 @@ const ROOMS = {
     objective:()=> "المنظار يدلّكم على الأشياء الباقية، والطوابع تسوي بطاقة بريد من اللوحة."
   }
 };
-ROOMS.study = {}; // غرفة دفترنا لها عرض خاص (notebook.js)
+/* غرفة دفترنا: غرفة دافية بشبّاك خريفي — كل شي بيها يفتح نشاط (بدل شبكة بطاقات) */
+ROOMS.study = {
+  bg:()=>wallBg("#7A4A30","#3A2418")+floorBg(700,"#6B4A2E","#3A2418"),
+  props:()=>`<g transform="translate(560 70)"><rect x="-20" y="-20" width="520" height="460" rx="20" fill="#5A3A24" stroke="#C99A3C" stroke-width="10"/>${P.rectView(0,0,480,420,.5,.45,1.6,"study").replace(/rx="240" ry="240"/,'rx="16" ry="16"')}<path d="M240 0v420M0 210h480" stroke="#5A3A24" stroke-width="14"/><path d="M-40 -30h560" stroke="#7A2E2A" stroke-width="22" stroke-linecap="round"/><path d="M-20 -24c40 160 30 300 -10 460M500 -24c-40 160-30 300 10 460" fill="none" stroke="#9B3B2E" stroke-width="40" opacity=".85"/></g>
+    ${P.shelf(30,140,220,520,5)}
+    <g transform="translate(300 300)"><path d="M0 400L60 0M180 400L120 0M90 0V420" stroke="#6B4A2E" stroke-width="14" stroke-linecap="round"/><rect x="10" y="40" width="160" height="200" fill="#FFFBEF" stroke="#8C6A48" stroke-width="6"/><circle cx="60" cy="110" r="26" fill="#E8C066"/><path d="M30 200q40-50 120-30" stroke="#5B7F4A" stroke-width="10" fill="none"/></g>
+    <g transform="translate(860 560)"><rect width="520" height="40" rx="8" fill="#8C6A48" stroke="#3A2418" stroke-width="6"/><path d="M30 40v200M490 40v200" stroke="#6B4A2E" stroke-width="22"/><path d="M120 -10l90-30 90 30v20H120z" fill="#7A2E2A" stroke="#3A1E14" stroke-width="5"/>${P.candle(440,0)}</g>
+    <g transform="translate(560 640)"><ellipse cx="120" cy="20" rx="140" ry="30" fill="#A07A50" stroke="#3A2418" stroke-width="6"/><path d="M120 50v120" stroke="#6B4A2E" stroke-width="20"/></g>
+    <g transform="translate(1180 120)"><rect width="300" height="220" rx="8" fill="#C9A47A" stroke="#6B4A2E" stroke-width="10"/>${[[20,20,"#FBF3E2"],[120,30,"#F1DDB0"],[210,16,"#FBF3E2"],[40,120,"#FBF3E2"],[150,120,"#F1DDB0"]].map(([x,y,c],i)=>`<rect x="${x}" y="${y}" width="80" height="70" fill="${c}" transform="rotate(${i%2?4:-4} ${x+40} ${y+35})" stroke="#8C6A48" stroke-width="2"/><circle cx="${x+40}" cy="${y+4}" r="6" fill="#B5482A"/>`).join("")}</g>
+    <g transform="translate(1400 420)"><rect width="110" height="150" rx="10" fill="#B5482A" stroke="#5A1E14" stroke-width="6"/><rect x="20" y="30" width="70" height="12" rx="4" fill="#2B1C17"/><path d="M55 150v130" stroke="#3A2418" stroke-width="14"/></g>
+    ${hasReward("decor_garland")?`<path d="M40 40Q800 160 1560 40" fill="none" stroke="#6E4A22" stroke-width="4"/>${Array.from({length:14},(_,i)=>`<g transform="translate(${80+i*105} ${60+Math.sin(i/13*Math.PI)*90}) scale(1.4)">${ART.maple(["#C8552B","#D9A53A","#B33A26"][i%3]).replace(/<\/?svg[^>]*>/g,"")}</g>`).join("")}`:""}
+    ${hasReward("decor_clock")?`<g transform="translate(1110 60) scale(1.6)">${clockSVG(9,0).replace(/<\/?svg[^>]*>/g,"")}</g>`:""}
+    ${hasReward("acc_lantern")?`<g transform="translate(900 470) scale(1.8)">${ART.lantern(true).replace(/<\/?svg[^>]*>/g,"")}</g>`:""}
+    ${hasItem("feather")?`<g transform="translate(1300 450) scale(1.6)">${ART.feather().replace(/<\/?svg[^>]*>/g,"")}</g>`:""}
+    ${WS.tickets.length>=5?`<g transform="translate(1210 380)"><rect width="150" height="100" fill="#C99A3C" stroke="#6E4A22" stroke-width="6"/><g transform="translate(15 15) scale(2)">${ART.ticket().replace(/<\/?svg[^>]*>/g,"")}</g></g>`:""}
+    ${hasReward("medal_clock")?`<g transform="translate(490 130)"><path d="M0 0l20 50 20-50" fill="#B5482A"/><circle cx="20" cy="70" r="28" fill="#E8C066" stroke="#8C6A2A" stroke-width="5"/><g transform="translate(4 54) scale(.4)">${clockSVG(12,0).replace(/<\/?svg[^>]*>/g,"")}</g></g>`:""}
+    ${flag("hatReturned")?`<g transform="translate(100 60)"><rect width="120" height="90" fill="#FBF3E2" stroke="#C99A3C" stroke-width="8"/><g transform="translate(20 6) scale(.4)">${ART.sumo("happy").replace(/<\/?svg[^>]*>/g,"")}</g></g>`:""}`,
+  kidsX:44, motes:true,
+  intro:()=>[["y",1,"غرفة دفترنا! دافية، والشبّاك يطل على القلعة."],["k",1,"كل شي هنا يشتغل: الدفتر، المرسم، صندوق الرسائل، وطاولة الرسم المشترك."],["y",2,"وبين الكتب القديمة… شي ورق مطوي؟"]],
+  spots:()=>[
+    {x:64,y:60,label:"المذكرات",art:()=>ART.book("#7A2E2A"),w:58,on:()=>go("diary")},
+    {x:24,y:44,label:"المرسم",art:()=>ART.studio(),w:62,on:()=>go("paint")},
+    {x:91,y:54,label:"صندوق الرسائل",art:()=>ART.letter(),w:52,on:()=>letterBox()},
+    {x:43,y:70,label:"رسم مشترك",art:()=>ART.butterfly("#E9A79E","#E8C066"),w:56,on:()=>go("draw")},
+    {x:83,y:26,label:"قوالب الرسم",art:()=>`<svg viewBox="0 0 60 60"><rect x="8" y="8" width="44" height="44" fill="#FBF3E2" stroke="#8C6A48" stroke-width="3"/><path d="M14 20h32M14 30h24M14 40h28" stroke="#3E6FA0" stroke-width="2"/></svg>`,w:52,on:templatesBox},
+    {x:52,y:30,label:"معرض رسومات الحكايات",on:galleryBox},
+    {x:10,y:42,label:"كتب قديمة",hide:()=>flag("clueRead"),cls:"faint",art:()=>ART.letter(),on:(ctx)=>{ modal(`<div class="letter">«يا سعدون الصغير،\nإذا ضعت بالقلعة، دوّر اللوحة اللي بيها أربع سماوات… وراها ممر يوصل لقلب الوقت.\n— جدّتك»</div><p class="d-note">انكشف «الممر خلف اللوحة» على الخريطة.</p>`); giveItem("clue"); setFlag("clueRead"); ctx.refresh(); }}
+  ],
+  actions:()=>[{l:"المذكرات",hot:true,run:()=>go("diary")},{l:"المرسم",run:()=>go("paint")},{l:"رسم مشترك",run:()=>go("draw")}],
+  objective:()=> "المذكرات والرسومات تنحفظ على هذا الجهاز فقط، وما نجمع أي بيانات. التنزيل كصورة من المرسم."
+};
+function templatesBox(){ const md=modal(`<h2>قوالب للرسم</h2><div class="br-tpls">${Object.entries(TEMPLATES).map(([k,n])=>`<button class="br-tpl" data-t="${k}"><canvas width="160" height="120" data-prev="${k}"></canvas><span>${n}</span></button>`).join("")}</div>`,{wide:true}); $$("[data-prev]",md.el).forEach(c=>drawTemplate(c.getContext("2d"),160,120,c.dataset.prev)); $$("[data-t]",md.el).forEach(b=>b.onclick=()=>{ md.close(); go("paint:"+b.dataset.t); }); }
+function galleryBox(){ const gal=Store.get("talesArt",[]); modal(`<h2>معرض رسومات الحكايات</h2>${gal.length?`<div class="br-gal">${gal.map(g=>`<figure><img src="${g.art}" alt="رسمة"><figcaption>${esc(g.t)}${g.line?" — "+esc(g.line):""}</figcaption></figure>`).join("")}</div>`:`<p>المعرض فاضي. الرسومات اللي ترسمونها بالحكايات تتعلّق هنا.</p>`}`,{wide:true}); }
 function checkHidden(ctx){ const all=["hf_hat","hf_bug","hf_rabbit","hf_moon"].every(f=>flag(f)||(f==="hf_hat"&&(hasItem("sumoHat")||flag("hatReturned")))); if(all && !flag("hiddenFound")){ setFlag("hiddenFound"); grantReward("wings_petals"); addStars(3,"أسرار الحديقة المخفية"); confetti(); } ctx.refresh(); }
 function telescope(){
   const leaves=LEAF_SPOTS.map((s,i)=>({...s,i})).filter(s=>!WS.leaves.includes(s.i)), notes=NOTE_SPOTS.map((s,i)=>({...s,i})).filter(s=>!WS.notes.includes(s.i));

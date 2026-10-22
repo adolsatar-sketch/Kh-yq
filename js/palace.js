@@ -15,6 +15,10 @@ const ACCS = {
   flowers:{name:"إكليل ورد", svg:()=>`<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">${[12,34,56,78,100].map((x,i)=>`<g transform="translate(${x-10} ${i%2?10:4}) scale(.36)">${ART.flower(["#F3C1BA","#FBF6E8","#E8C066"][i%3]).replace(/<\/?svg[^>]*>/g,"")}</g>`).join("")}</svg>`},
   tophat:{name:"قبعة عالية", svg:()=>`<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg"><rect x="34" y="6" width="52" height="50" rx="4" fill="#2B2B33"/><rect x="34" y="40" width="52" height="8" fill="#7A2E2A"/><ellipse cx="60" cy="58" rx="54" ry="10" fill="#2B2B33"/></svg>`},
   beret:{name:"بيريه", svg:()=>`<svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg"><ellipse cx="60" cy="30" rx="54" ry="18" fill="#7A2E2A"/><circle cx="60" cy="12" r="4" fill="#7A2E2A"/></svg>`},
+  conductor:{name:"قبعة سائق القطار", svg:()=>`<svg viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg"><path d="M22 40C24 12 96 12 98 40Z" fill="#2E3E5C" stroke="#1E2A40" stroke-width="3"/><rect x="20" y="36" width="80" height="9" rx="4" fill="#D9A53A" stroke="#8C6A2A" stroke-width="2"/><path d="M20 44q-10 8 0 12h40l-6-12z" fill="#1E2A40"/><circle cx="60" cy="26" r="6" fill="#D9A53A"/></svg>`},
+  mushroom:{name:"قبعة فطر وردية", svg:()=>ART.sumoHat()},
+  feather:{name:"ريشة البومة", slot:"hair", svg:()=>ART.feather()},
+  lantern:{name:"فانوس صغير", slot:"hand", svg:()=>ART.lantern(true)},
   glasses:{name:"نظارات", svg:()=>`<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg"><circle cx="38" cy="20" r="14" fill="rgba(200,230,240,.3)" stroke="#6B4A2E" stroke-width="4"/><circle cx="82" cy="20" r="14" fill="rgba(200,230,240,.3)" stroke="#6B4A2E" stroke-width="4"/><path d="M52 20h16" stroke="#6B4A2E" stroke-width="4"/></svg>`}
 };
 const CATS = [
@@ -26,9 +30,13 @@ const ITEMS = {
   bottom:[{id:"jeans",n:"جينز",at:0},{id:"wide",n:"بنطلون واسع",at:0},{id:"shorts",n:"شورت",at:2},{id:"skirt",n:"تنورة A",at:0},{id:"pleat",n:"تنورة بليسيه",at:4}],
   jacket:[{id:"none",n:"بدون",at:0},{id:"blazer",n:"بليزر",at:0},{id:"denim",n:"جاكيت جينز",at:3},{id:"coat",n:"معطف فكتوري",at:7},{id:"cape",n:"كاب",at:12},{id:"cardigan",n:"كارديغان",at:5}],
   shoes:[{id:"boots",n:"بوت",at:0},{id:"sneakers",n:"سنيكرز",at:0},{id:"mary",n:"ماري جين",at:2},{id:"sandals",n:"صندل",at:8}],
-  wings:[{id:"none",n:"بدون",at:0}].concat(Object.entries(WINGS).map(([k,w],i)=>({id:k,n:w.name,at:[0,0,4,8,12,15,22][i]||0}))),
-  acc:[{id:"none",n:"بدون",at:0}].concat(Object.entries(ACCS).map(([k,a],i)=>({id:k,n:a.name,at:[0,0,6,3,9][i]||0})))
+  wings:[{id:"none",n:"بدون",at:0}].concat(Object.entries(WINGS).map(([k,w],i)=>({id:k,n:w.name,at:[0,0,4,8,12,15,22][i]||0, q:"wings_"+k}))),
+  acc:[{id:"none",n:"بدون",at:0}].concat(Object.entries(ACCS).map(([k,a])=>({id:k,n:a.name,at:{crown:0,flowers:0,tophat:6,beret:3,glasses:9}[k]??999, q:"acc_"+k})))
 };
+/* القطعة تنفتح بنجوم الألعاب، أو كمكافأة مهمة بالعالم (بدون دفع أو حظ) */
+const itemOpen = it => progress.stars>=it.at || !!(it.q && typeof hasReward==="function" && hasReward(it.q));
+const itemHow = it => it.at<999 ? `${it.at} نجمة${it.q&&REWARDS[it.q]?" أو مهمة":""}` : "مكافأة مهمة";
+const unlockedOf = cat => ITEMS[cat].filter(itemOpen);
 const DEFAULT_LOOK = {
   k:{mode:"set", top:{id:"vest",c:"#7A2E2A"}, bottom:{id:"wide",c:"#6B4A2E"}, jacket:{id:"coat",c:"#3A2A22"}, shoes:{id:"boots",c:"#6B4A2E"}, dress:{id:"aline",c:"#2F5E57"}, wings:{id:"none",c:"#C8552B"}, acc:{id:"none"}, len:2, fit:1},
   y:{mode:"dress", top:{id:"blouse",c:"#F3E6C8"}, bottom:{id:"skirt",c:"#2F5E57"}, jacket:{id:"none",c:"#2F5E57"}, shoes:{id:"boots",c:"#6B4A2E"}, dress:{id:"puff",c:"#2F5E57"}, wings:{id:"none",c:"#B9A6DD"}, acc:{id:"none"}, len:1, fit:1}
@@ -110,7 +118,12 @@ function dollSVG(who, L, opts={}){
   if(A==="flowers") acc=`<g transform="translate(92 54) scale(.98)">${ACCS.flowers.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="tophat") acc=`<g transform="translate(92 6) scale(.98)">${ACCS.tophat.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="beret") acc=`<g transform="translate(94 40) scale(.94)">${ACCS.beret.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(A==="conductor") acc=`<g transform="translate(90 18) scale(1)">${ACCS.conductor.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(A==="mushroom") acc=`<g transform="translate(96 8) scale(1.8)">${ART.sumoHat().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(A==="feather") acc=`<g transform="translate(196 34) rotate(24) scale(1.2)">${ART.feather().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(A==="lantern") acc=`<g transform="translate(200 300) scale(1.1)">${ART.lantern(true).replace(/<\/?svg[^>]*>/g,"")}</g>`;
   if(A==="glasses") acc=`<g transform="translate(90 110)">${ACCS.glasses.svg().replace(/<\/?svg[^>]*>/g,"")}</g>`;
+  if(who==="y" && A!=="mushroom" && A!=="conductor") acc=`<g transform="translate(194 52) rotate(18) scale(.9)">${ART.maple("#D98A2E").replace(/<\/?svg[^>]*>/g,"")}</g>`+acc;
   const scarf = who==="k" && !isDress ? `<path d="M126 190Q150 204 174 190L170 206Q150 214 130 206Z" fill="#B5482A"/><path d="M160 204L166 250L156 248Z" fill="#B5482A"/>` : "";
   return `<svg class="doll" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${CH[who].name}">${W}${back}${body}${shoe}${cloth}${top}${scarf}${head}${hair}${acc}</svg>`;
 }
@@ -120,11 +133,14 @@ function viewPalace(root, opts={}){
   const v=h(`<section class="view palace"><div class="pal-bg"></div><div class="chandelier" aria-hidden="true"></div>${leafLayer(6,"soft")}
     <div class="pal-wrap">
       <div class="pal-stage panel"><div class="pal-doll" data-doll></div>
+        <div class="pal-elaf"><img class="girl idle" src="${GIRL}" alt="${esc(heroName())} الستايلست" draggable="false"><span class="say" data-tip>${esc(heroName())}: أنا الستايلست اليوم! اختاروا تحدي وصمموا.</span></div>
+        ${opts.shared?"":`<button class="pal-sumo" data-sumo aria-label="${CONFIG.guestName}">${ART.sumo(flag("hatReturned")?"happy":"idle").replace('<ellipse cx="100" cy="210"', flag("hatReturned")?'<g transform="translate(46 0) scale(1.8)">'+ART.sumoHat().replace(/<\/?svg[^>]*>/g,"")+'</g><ellipse cx="100" cy="210"':'<ellipse cx="100" cy="210"')}</button>`}
         <div class="seg pal-who"><button data-who="k">${faceHTML("k",0,28)} خباب</button><button data-who="y">${faceHTML("y",0,28)} يقين</button></div></div>
       <div class="pal-tools panel">
         <div class="pal-cats" role="tablist">${CATS.map(c=>`<button data-cat="${c.k}" role="tab">${c.name}</button>`).join("")}</div>
         <div class="pal-items" data-items></div>
         <div class="pal-colors" data-colors></div>
+        <div class="pal-chal" data-chal></div>
         <div class="pal-sliders"><label>الطول <input type="range" min="0" max="2" step="1" data-len></label><label>المقاس <input type="range" min="0" max="2" step="1" data-fit></label></div>
         <div class="row" style="margin-top:8px">${shared?"":`<button class="btn honey" data-show>${IC.star} مسرح العرض</button>`}<button class="btn ghost small" data-reset>${IC.restart} الشكل الأصلي</button></div>
         <p class="d-note">القطع المقفولة تنفتح بنجوم الألعاب. عندج الآن ${progress.stars} نجمة.</p>
@@ -137,14 +153,22 @@ function viewPalace(root, opts={}){
   function drawItems(){
     $$("[data-cat]",v).forEach(b=>{ b.setAttribute("aria-selected", b.dataset.cat===cat); b.hidden = CATS.find(c=>c.k===b.dataset.cat).who && CATS.find(c=>c.k===b.dataset.cat).who!==who && false; });
     const list=ITEMS[cat]; const cur = cat==="dress" ? (L().mode==="dress"?L().dress.id:"") : (L()[cat]||{}).id;
-    $("[data-items]",v).innerHTML = list.map(it=>{ const lock=progress.stars<it.at; return `<button class="pal-item ${lock?"locked":""}" data-it="${it.id}" aria-pressed="${cur===it.id}" ${lock?`title="تنفتح عند ${it.at} نجوم"`:""}>${lock?IC.lock:""}<span>${it.n}</span>${lock?`<small>${it.at} نجمة</small>`:""}</button>`; }).join("");
-    $$("[data-it]",v).forEach(b=>b.onclick=()=>{ if(b.classList.contains("locked")){ toast("تنفتح بنجوم الألعاب","lock"); return; } const id=b.dataset.it; if(cat==="dress"){ L().mode="dress"; L().dress.id=id; } else { if(cat==="top"||cat==="bottom") L().mode="set"; L()[cat]=Object.assign(L()[cat]||{}, {id}); } Sound.pop(); save(); drawDoll(); drawItems(); kidDance(); });
+    $("[data-items]",v).innerHTML = list.map(it=>{ const lock=!itemOpen(it); return `<button class="pal-item ${lock?"locked":""}" data-it="${it.id}" aria-pressed="${cur===it.id}" ${lock?`title="تنفتح: ${itemHow(it)}"`:""}>${lock?IC.lock:""}<span>${it.n}</span>${lock?`<small>${itemHow(it)}</small>`:""}</button>`; }).join("");
+    $$("[data-it]",v).forEach(b=>b.onclick=()=>{ if(b.classList.contains("locked")){ toast("تنفتح بنجوم الألعاب أو بمهمات العالم — شوفوا دفتر المهام","lock"); return; } const id=b.dataset.it; if(cat==="dress"){ L().mode="dress"; L().dress.id=id; } else { if(cat==="top"||cat==="bottom") L().mode="set"; L()[cat]=Object.assign(L()[cat]||{}, {id}); } Sound.pop(); save(); drawDoll(); drawItems(); kidDance(); });
     const target = cat==="dress"?L().dress:L()[cat];
     $("[data-colors]",v).innerHTML = cat==="acc" ? "" : PALETTE.map(c=>`<button class="swatch" data-col="${c}" style="background:${c}" aria-label="لون" aria-pressed="${target&&target.c===c}"></button>`).join("");
     $$("[data-col]",v).forEach(b=>b.onclick=()=>{ const t = cat==="dress"?L().dress:L()[cat]; if(!t) return; t.c=b.dataset.col; save(); drawDoll(); drawItems(); });
     $("[data-len]",v).value=L().len??1; $("[data-fit]",v).value=L().fit??1;
   }
-  const kidDance=()=>{ const d=$("[data-doll]",v); kidAct(d,"happy"); };
+  const kidDance=()=>{ const d=$("[data-doll]",v); kidAct(d,"happy"); drawChal(); tip(); };
+  let chal = Store.get("styleChal", STYLE_CHALLENGES[0].id), tipT;
+  const tipEl=$("[data-tip]",v);
+  function tip(force){ const C=STYLE_CHALLENGES.find(c=>c.id===chal); const miss=C.rules.filter(r=>!r[1](L())); if(!force && Math.random()<.5) return; tipEl.textContent = heroName()+": "+(miss.length ? pick(["حلو! ","يجنن! ","ممم… ","خوش اختيار! "])+"بس لتحدي «"+C.n+"» جرّبوا: "+miss[0][0]+"." : pick(["هاي الإطلالة كاملة! ","واو، جاهزين للمسرح! "])+"قيّموها وشوفوا."); kidAct($(".pal-elaf",v),"talk"); }
+  function drawChal(){ const C=STYLE_CHALLENGES.find(c=>c.id===chal); const box=$("[data-chal]",v);
+    box.innerHTML=`<b>تحدي ${esc(heroName())}:</b><div class="pal-cats">${STYLE_CHALLENGES.map(c=>`<button data-ch="${c.id}" aria-selected="${c.id===chal}">${esc(c.n)}${progress["once_style_"+c.id]?" ✔":""}</button>`).join("")}</div><ul class="q-sub">${C.rules.map(r=>{ const ok=r[1](L()); return `<li class="${ok?"done":""}">${ok?IC.check:"<i class='dotx'></i>"}${esc(r[0])}</li>`; }).join("")}</ul><button class="btn small" data-rate>${IC.star} خلّي ${esc(heroName())} تقيّم</button>`;
+    $$("[data-ch]",box).forEach(b=>b.onclick=()=>{ chal=b.dataset.ch; Store.set("styleChal",chal); drawChal(); tip(true); });
+    $("[data-rate]",box).onclick=()=>{ const n=styleScore(C, L()); Sound.chime(); tipEl.textContent=heroName()+": "+["نبدي من جديد؟ اختاروا قطعة وحدة من القائمة.","بداية حلوة! بعد شوية.","قريبة كلش! ناقص شي واحد.","تحفة! ثلاث نجوم من الستايلست."][n]; kidAct($(".pal-elaf",v),"happy"); if(n===3){ confetti(); addStarsOnce("style_"+C.id, 2, "تحدي «"+C.n+"»"); drawChal(); } };
+  }
   $$("[data-cat]",v).forEach(b=>b.onclick=()=>{ cat=b.dataset.cat; drawItems(); });
   const setWho=w=>{ who=w; $$("[data-who]",v).forEach(b=>b.setAttribute("aria-pressed",b.dataset.who===w)); drawDoll(); drawItems(); };
   $$("[data-who]",v).forEach(b=>b.onclick=()=>setWho(b.dataset.who));
@@ -153,11 +177,24 @@ function viewPalace(root, opts={}){
   $("[data-fit]",v).oninput=e=>{ L().fit=+e.target.value; save(); drawDoll(); };
   const sb=$("[data-show]",v); if(sb) sb.onclick=()=>go("show");
   $("[data-reset]",v).onclick=()=>{ looks[who]=JSON.parse(JSON.stringify(DEFAULT_LOOK[who])); save(); setWho(who); };
-  setWho(who);
+  setWho(who); drawChal();
+  const sumoB=$("[data-sumo]",v); if(sumoB) sumoB.onclick=()=>{ react(sumoB,"hop"); setFlag("metSumo"); dialogue(v, hasItem("sumoHat") && !flag("hatReturned") ? [["sumo",1,"قبعتي!! خلّوني أشوفها… روحوا للخريطة وسلّموها بقصر الأزياء."]] : [["sumo",flag("hatReturned")?1:0,npcLine("sumo")]]); };
   return {setWho, looks, redraw:()=>{ drawDoll(); drawItems(); }};
 }
+/* تحديات ستايلست: أيلاف تختار موضوع وتقيّم الإطلالة (بدون عقاب، بس تلميحات) */
+const WARM=["#7A2E2A","#B5482A","#D9A53A","#6B4A2E","#C8552B"], NIGHT=["#3E4A7A","#2B2B33","#B9A6DD"], SOFT=["#E9A79E","#5B7F4A","#FFFFFF","#F3E6C8","#C76B8E","#8EC3CF"];
+const lookColors = L => (L.mode==="dress" ? [L.dress.c] : [L.top.c, L.bottom.c]).concat(L.jacket && L.jacket.id!=="none" ? [L.jacket.c] : []);
+const accId = L => (L.acc&&L.acc.id)||"none", wingId = L => (L.wings&&L.wings.id)||"none";
+const STYLE_CHALLENGES = [
+  {id:"autumn", n:"خريف ذهبي", rules:[["لون دافي (أحمر، برتقالي، ذهبي أو بني)", L=>lookColors(L).some(c=>WARM.includes(c))],["أجنحة أوراق خريف أو تاج أوراق", L=>wingId(L)==="maple"||accId(L)==="crown"],["بوت أو جاكيت", L=>L.shoes.id==="boots"||(L.jacket&&L.jacket.id!=="none")]]},
+  {id:"party", n:"حفلة القلعة", rules:[["فستان سهرة، ساتان، أو معطف/كاب", L=>(L.mode==="dress"&&["gown","slip"].includes(L.dress.id))||["coat","cape"].includes(L.jacket&&L.jacket.id)],["قبعة عالية أو تاج", L=>["tophat","crown"].includes(accId(L))],["أجنحة لامعة (زجاج أو شفافة)", L=>["glass","crystal"].includes(wingId(L))]]},
+  {id:"garden", n:"نزهة بالحديقة", rules:[["سنيكرز أو ماري جين", L=>["sneakers","mary"].includes(L.shoes.id)],["إكليل ورد", L=>accId(L)==="flowers"],["لون فاتح (وردي، أخضر، أبيض)", L=>lookColors(L).some(c=>SOFT.includes(c))]]},
+  {id:"train", n:"رحلة القطار", rules:[["معطف فكتوري أو جاكيت جينز", L=>["coat","denim"].includes(L.jacket&&L.jacket.id)],["قبعة سائق القطار أو بيريه", L=>["conductor","beret"].includes(accId(L))],["بوت", L=>L.shoes.id==="boots"]]},
+  {id:"night", n:"نجوم الليل", rules:[["لون ليلي (كحلي، أسود، بنفسجي)", L=>lookColors(L).some(c=>NIGHT.includes(c))],["أجنحة شفافة مضيئة أو زجاج ملوّن", L=>["crystal","glass"].includes(wingId(L))],["فانوس صغير أو نظارات", L=>["lantern","glasses"].includes(accId(L))]]}
+];
+const styleScore = (C, L) => C ? C.rules.filter(r=>r[1](L)).length : 0;
 /* runway show (solo or shared with a friend) */
-const THEMES = ["خريف ذهبي","حفلة القلعة","مطر وغيمة","نجوم الليل","نزهة بالحديقة","رحلة القطار"];
+const THEMES = ["خريف ذهبي","حفلة القلعة","نجوم الليل","نزهة بالحديقة","رحلة القطار","مطر وغيمة"];
 function runwayMusic(){ if(!prefs.sound) return ()=>{}; const notes=[523,659,784,659,587,698,880,698,523,659,784,1046]; let i=0; const t=setInterval(()=>{ Sound.note(notes[i%notes.length]); if(i%3===0) Sound.note(notes[i%notes.length]/2); i++; }, 330); return ()=>clearInterval(t); }
 function runwayHTML(looks, theme, walk){
   return `<div class="runway"><div class="rw-lights">${[0,1,2,3].map(i=>`<i style="--d:${i*.7}s;--x:${12+i*25}%"></i>`).join("")}</div><div class="rw-curtain l"></div><div class="rw-curtain r"></div>
@@ -176,7 +213,13 @@ function viewShow(root){
   const pal = viewPalace($("[data-design]",v), {who: myWho||"y", shared: net ? {lock:true, onChange:(w,l)=>Party.send({t:"look", who:w, look:l})} : null});
   $("[data-design] .palace",v).classList.add("embedded");
   let stopMusic=()=>{}, readyMe=false, readyOther=false;
-  function play(){ const looks=lookStore(); if(net && Party.otherLook) looks[Party.me.char==="k"?"y":"k"]=Party.otherLook; const st=$("[data-stage]",v); st.innerHTML=runwayHTML(looks, theme, walk); st.scrollIntoView({behavior:motionOK()?"smooth":"auto"}); stopMusic(); stopMusic=runwayMusic(); setTimeout(()=>{ stopMusic(); stopMusic=()=>{}; }, 14000); Sound.chime(); confetti(); addStarsOnce("runway1",2,"أول عرض أزياء"); readyMe=readyOther=false; upd(); }
+  let judgeT=0;
+  function play(){ const looks=lookStore(); if(net && Party.otherLook) looks[Party.me.char==="k"?"y":"k"]=Party.otherLook; const st=$("[data-stage]",v); st.innerHTML=runwayHTML(looks, theme, walk); st.scrollIntoView({behavior:motionOK()?"smooth":"auto"}); stopMusic(); stopMusic=runwayMusic(); setTimeout(()=>{ stopMusic(); stopMusic=()=>{}; }, 14000); Sound.chime(); confetti(); addStarsOnce("runway1",2,"أول عرض أزياء"); if(typeof checkUnlocks==="function") checkUnlocks(); readyMe=readyOther=false;
+    clearTimeout(judgeT); const C=STYLE_CHALLENGES.find(c=>c.n===theme);
+    judgeT=setTimeout(()=>{ if(!document.body.contains(v)) return; const a=styleScore(C,looks.k), b=styleScore(C,looks.y), sum=a+b;
+      modal(`<h2>لجنة التحكيم: ${esc(heroName())} و${esc(CONFIG.guestName)}</h2><div class="judge"><div>${faceHTML("k",a>=2?1:0,56)}<b>خباب</b>${rateStars(C?a:3)}</div><div>${faceHTML("y",b>=2?1:0,56)}<b>يقين</b>${rateStars(C?b:3)}</div></div><p>${C?`موضوع «${esc(theme)}»: مجموعكم ${sum} من 6. `:"موضوع حر: كل الإطلالات تفوز! "}${esc(sum>=5||!C?pick(["المسرح كله صفّق!",CONFIG.guestName+" رقص من الفرح!"]):"عرض حلو! "+heroName()+" تگول: شوفوا تحدي الموضوع بالورشة حتى تكملون النجوم.")}</p>`);
+      if(C && sum===6) addStarsOnce("duo_"+C.id, 3, "عرض مشترك كامل");
+    }, motionOK()?12500:600); upd(); }
   function upd(){ $("[data-st]",v).textContent = net ? (readyMe?(readyOther?"يلا!":"بانتظار صاحبج"):"") : ""; }
   $("[data-theme]",v).onchange=e=>{ theme=e.target.value; Store.set("showTheme",theme); if(net) Party.send({t:"theme", theme}); };
   $("[data-walk]",v).onchange=e=>{ walk=e.target.value; if(net) Party.send({t:"walk", walk}); };
@@ -190,7 +233,7 @@ function viewShow(root){
     offs.push(Party.on("showgo", ()=>play()));
     Party.send({t:"look", who:myWho, look:lookStore()[myWho]});
   }
-  return ()=>{ stopMusic(); offs.forEach(f=>f()); };
+  return ()=>{ stopMusic(); clearTimeout(judgeT); offs.forEach(f=>f()); };
 }
 Object.assign(ROUTES, {
   palace:{view:r=>{ viewPalace(r); }, title:()=>"قصر الأزياء", parent:"world"},

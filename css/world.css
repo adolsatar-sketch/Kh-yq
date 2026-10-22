@@ -261,3 +261,31 @@
 .spine{display:grid;place-items:center;width:52px;height:130px;border-radius:6px;background:var(--c);color:#FFF3DC;font-family:var(--font-v);font-size:1.05rem;writing-mode:vertical-rl;border:2px solid rgba(0,0,0,.4)}
 .pc-cv{width:100%;height:auto;border-radius:8px;display:block;margin:6px 0}
 .ride-train svg{width:90px;height:auto}
+
+/* ---------- حكايات متفرعة ---------- */
+.tb-ends{display:flex;gap:5px;justify-content:center;margin-top:4px}.tb-ends i{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,231,176,.7)}.tb-ends i.on{background:#FFE7B0}
+.tl-kids{align-items:flex-end}.tl-kids .npc-fig{height:120px}
+.tale-net{background:#2F5E57!important;color:#fff;pointer-events:none}
+.tc-head{display:flex;gap:10px;align-items:center;margin-bottom:8px}.tc-head h3{margin:0;font-family:var(--font-v);font-size:1.3rem}
+.tc-opts{display:grid;gap:8px}.tc-opt{justify-content:flex-start;text-align:start;min-height:52px;font-size:1.05rem}
+
+/* ---------- opening on portrait phones: اللوحة كاملة بدون قص ---------- */
+@media (orientation:portrait){
+  .opening .op-castle{max-width:100%!important;max-height:100%!important;width:100%!important;height:auto!important;animation:none!important;transform:none}
+  .opening .op-frame{align-items:center;padding-bottom:6vh}
+  .opening .curtain{width:52%}
+}
+
+/* ---------- قصر الأزياء: أيلاف الستايلست وسومو ---------- */
+.pal-stage{position:relative;overflow:hidden;min-height:420px}
+.pal-elaf{position:absolute;bottom:0;inset-inline-start:4px;width:30%;max-width:150px;z-index:3}
+.pal-elaf .girl{width:100%;height:auto}
+.pal-elaf .say{bottom:100%;inset-inline-start:0;max-width:min(240px,62vw);font-size:.82rem}
+.pal-sumo{position:absolute;bottom:4px;inset-inline-end:6px;width:20%;max-width:96px;border:0;background:none;padding:0;z-index:3;animation:sway 3.6s ease-in-out infinite}
+.pal-sumo svg{width:100%;height:auto;display:block}
+.pal-doll{position:relative;z-index:2}
+.pal-chal{display:grid;gap:6px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,var(--honey) 14%,var(--paper));border:2px dashed var(--honey)}
+.pal-chal .q-sub{padding:0}
+.dotx{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid var(--panel-edge)}
+.judge{display:flex;gap:20px;justify-content:center;margin:10px 0}.judge>div{display:grid;justify-items:center;gap:4px}
+@media (max-width:760px){ .pal-doll{width:min(70%,300px)} .pal-stage{min-height:360px} }

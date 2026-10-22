@@ -297,7 +297,7 @@ function viewDraw(root){
   return ()=>{ ro.disconnect(); offs.forEach(f=>f()); };
 }
 Object.assign(ROUTES, {
-  book:{view:r=>viewBook(r), title:()=>"دفترنا", parent:"world"},
+  book:{view:r=>viewRoom(r,"study"), title:()=>"غرفة دفترنا", parent:"world"},
   draw:{view:r=>viewDraw(r), title:()=>"رسم مشترك", parent:"book"}
 });
 ROUTES.paint = {view:(r,id)=>viewPaint(r,id), title:()=>"المرسم", parent:"book"};
